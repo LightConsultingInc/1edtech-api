@@ -1,0 +1,6 @@
+.openapi-generator-ignore
+Model/CFAssociationType.sql
+Model/CFDocumentType.sql
+Model/CFItemType.sql
+README.md
+mysql_schema.sql
