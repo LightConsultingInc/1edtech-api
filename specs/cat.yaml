@@ -1,0 +1,1210 @@
+# #####################################################################################
+# YAML File Information
+# #####################################################################################
+# 
+# Author:         Colin Smythe (IMS Global, UK), Mark McKell (IMS Global, USA)
+# Date:           9th November, 2020
+# Version:        1.0
+# Status:         IMS Candidate Final
+# Description:    The Computer Adaptive Testing (CAT) Service enables a standard way of implementing adaptive testing using Question and Test Interoperability (QTI). This service has been described using the IMS Model Driven Specification development approach, this being the Platform Specific Model (PSM) of the service.
+# 
+# History:        This is the first release of the Computer Adaptive Testing (CAT) Service definition.
+# 
+# License:        IPR and Distribution Notices
+# 
+#                 This machine readable file is derived from the IMS Computer Adaptive Testing (CAT) Service Version 1.0
+#                 found at http://www.imsglobal.org/cat and the original IMS Global schema binding or code base
+#                 http://www.imsglobal.org/cat.
+# 
+#                 Recipients of this document are requested to submit, with their comments, notification of any relevant 
+#                 patent claims or other intellectual property rights of which they may be aware that might be infringed by
+#                 any implementation of the specification set forth in this document, and to provide supporting documentation.
+# 
+#                 IMS takes no position regarding the validity or scope of any intellectual property or other rights that might
+#                 be claimed to pertain to the implementation or use of the technology described in this document or the extent 
+#                 to which any license under such rights might or might not be available; neither does it represent that it has 
+#                 made any effort to identify any such rights. Information on IMS procedures with respect to rights in IMS 
+#                 specifications can be found at the IMS Global Intellectual Property Rights web page: http://www.imsglobal.org/ipr/imsipr_policyFinal.pdf.
+# 
+#                 Copyright (c) IMS Global Learning Consortium 1999-2021. All Rights Reserved.
+# 
+#                 Use of this specification to develop products or services is governed by the license with IMS found on the IMS website: http://www.imsglobal.org/license.html.
+# 
+#                 Permission is granted to all parties to use excerpts from this document as needed in producing requests for proposals.
+# 
+#                 The limited permissions granted above are perpetual and will not be revoked by IMS or its successors or assigns.
+# 
+#                 THIS SPECIFICATION IS BEING OFFERED WITHOUT ANY WARRANTY WHATSOEVER, AND IN PARTICULAR, ANY WARRANTY OF NONINFRINGEMENT IS
+#                 EXPRESSLY DISCLAIMED. ANY USE OF THIS SPECIFICATION SHALL BE MADE ENTIRELY AT THE IMPLEMENTERS OWN RISK, AND NEITHER THE CONSORTIUM
+#                 NOR ANY OF ITS MEMBERS OR SUBMITTERS, SHALL HAVE ANY LIABILITY WHATSOEVER TO ANY IMPLEMENTER OR THIRD PARTY FOR ANY DAMAGES OF
+#                 ANY NATURE WHATSOEVER, DIRECTLY OR INDIRECTLY, ARISING FROM THE USE OF THIS SPECIFICATION.
+# 
+# Source UML File Information
+# ===========================
+# The source file information must be supplied as an XMI file (without diagram layout information).
+# The supported UML authoring tools are:
+# (a) Poseidon - v6 (and later)
+# (b) Papyrus - v1.1.3 (and later)
+# 
+# Source XSLT File Information
+# ============================
+# XSL Generator:    Specificationv1p0_GenerationToolv1.xsl
+# XSLT Processor:   Saxon
+# Release:          1.0
+# Date:             31st January, 2021
+# Autogen Engineer: Colin Smythe (IMS Global, UK)
+# Autogen Date:     2021-01-30
+# 
+# IMS Global Auto-generation Binding Tool-kit (I-BAT)
+# ===================================================
+# This file was auto-generated using the IMS Global Binding Auto-generation Tool-kit (I-BAT).  While every
+# attempt has been made to ensure that this tool auto-generates the files correctly, users should be aware
+# that this is an experimental tool.  Permission is given to make use of this tool.  IMS Global makes no
+# claim on the materials created by third party users of this tool.  Details on how to use this tool
+# are contained in the IMS Global "I-BAT" documentation available at the IMS Global web-site:
+# http://www.imsglobal.org.
+# 
+# Tool Copyright:  2012-2021  (c) IMS Global Learning Consortium Inc.  All Rights Reserved.
+# 
+# #####################################################################################
+
+openapi: '3.0.0'
+
+#####################################################################################
+#                               API Information                                     #
+#####################################################################################
+info: 
+    version: '1.0'
+    title: Computer Adaptive Testing (CAT) Service OpenAPI (YAML) Definition
+    description: The Computer Adaptive Testing (CAT) Service enables a standard way of implementing adaptive testing using Question and Test Interoperability (QTI). This service has been described using the IMS Model Driven Specification development approach, this being the Platform Specific Model (PSM) of the service.
+    termsOfService: https://www.imsglobal.org/license.html
+    contact: 
+        name: Lisa Mattson (COO), IMS Global
+        url: http://www.imsglobal.org
+        email: lmattson@imsglobal.org
+    license: 
+        name: IMS Global
+        url: https://www.imsglobal.org/license.html
+
+#####################################################################################
+#                                 Servers                                           #
+#####################################################################################
+servers: 
+    - url: www.imsglobal.org/ims/cat/v1p0
+      description: The above Server URL should be changed to the actual server location.
+
+#####################################################################################
+#                                  Tags                                             #
+#####################################################################################
+tags: 
+    - name: SectionsManager
+      description: |
+        The set of service operations that manage access to the adaptive Sections being handled by the CAT Engine.
+    - name: SessionsManager
+      description: |
+        The set of service operations that manage access to the adaptive Sessions being handled by the CAT Engine.
+
+#####################################################################################
+#                                   Paths                                           #
+#####################################################################################
+paths: 
+    /sections:
+        post:
+            operationId: createSection
+            summary: The REST createbp request message for the createSection() API call.
+            tags: 
+                - SectionsManager
+            description: |
+                This is a request to the CAT Engine to create a new adaptive Section. The CAT Engine is responsible for assigning the unique identifier to be used for this Section in other exchanges. This request is NOT idempotent.
+            security:
+                - OAuth2CCG:
+                    - https://purl.imsglobal.org/cat/v1p0/scope/api
+                    - https://purl.imsglobal.org/cat/v1p0/scope/configure
+            requestBody:
+                description: |
+                    The data for the configuration of the new adaptive Section.
+                content: 
+                    application/json: 
+                        schema: 
+                            $ref: "#/components/schemas/SectionDType"
+                required: true
+            responses: 
+                "201" : 
+                    description: |
+                        The response code for when the new Section has been created in the CAT Engine and the associated identifier has been returned.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/CreateSectionResponseBodyDType"
+                "400" : 
+                    description: |
+                        The request has been declared as 'bad'.  This will be due to the provision of bad data in the request payloads, including  a poorly formed JSON payload. This is accompanied by the 'codeMajor/severity' values of 'failure/error'.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "401" : 
+                    description: |
+                        The request was not correctly authorized i.e. 'unauthorisedrequest'. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. 
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "500" : 
+                    description: |
+                        This code should be used only if there is catastrophic error and there is not a more appropriate code i.e. 'internal_server_error'. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. 
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "default" : 
+                    description: |
+                        This is the response data payload to be supplied when the HTTP code is NOT explicitly defined. This would be accompanied by the 'codeMajor/severity' values of 'failure/error' and the appropriate 'codeMinor' value. The associated HTTP code will also be supplied.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+
+    /sections/{sectionIdentifier}:
+        get:
+            operationId: getSection
+            summary: The REST read request message for the getSection() API call.
+            tags: 
+                - SectionsManager
+            description: |
+                This request returns the parameters which were used by the CAT engine to create the adaptive section, and the list of the items in the adaptive section's item pool, as configured by the CAT engine. It is recommended that assessment platforms and/or delivery engines use this request to verify that the item pool, as configured by the CAT engine, corresponds exactly to the list of items in the QTI source for the adaptive section. It is also recommended that test administrators verify that each item in the item pool is accessible and deliverable before commencing delivery of candidate sessions. The Get Section request may be used for this, and may be made at any time after a successful Create Section request, as many times as required.
+            parameters: 
+                - name: sectionIdentifier
+                  in: path
+                  description: |
+                      The LUID that identifies the Section for which the data on the CAT Engine is to be obtained.
+                  required: true
+                  schema: 
+                      type: string
+                  style: simple
+            security:
+                - OAuth2CCG:
+                    - https://purl.imsglobal.org/cat/v1p0/scope/api
+                    - https://purl.imsglobal.org/cat/v1p0/scope/configure
+            responses: 
+                "200" : 
+                    description: |
+                        The response code for when the list of Items in the section's item pool has been returned. The response message contains the list of Items, the section configuration used to create the section, and any qtiUsagedata and qtiMetadata used to create the section.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/GetSectionResponseBodyDType"
+                "400" : 
+                    description: |
+                        The request has been declared as 'bad'.  This will be due to the provision of bad data in the request payloads, including  a poorly formed JSON payload. This is accompanied by the 'codeMajor/severity' values of 'failure/error'.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "401" : 
+                    description: |
+                        The request was not correctly authorized i.e. 'unauthorisedrequest'. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. 
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "404" : 
+                    description: |
+                        The supplied identifier is unknown in the CAT Engine and so the object could not be processed. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. The statement 'Unknown Object' of should also be presented.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "500" : 
+                    description: |
+                        This code should be used only if there is catastrophic error and there is not a more appropriate code i.e. 'internal_server_error'. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. 
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "default" : 
+                    description: |
+                        This is the response data payload to be supplied when the HTTP code is NOT explicitly defined. This would be accompanied by the 'codeMajor/severity' values of 'failure/error' and the appropriate 'codeMinor' value. The associated HTTP code will also be supplied.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+        delete:
+            operationId: endSection
+            summary: The REST delete request message for the endSection() API call.
+            tags: 
+                - SectionsManager
+            description: |
+                This request ends all candidate sessions for the section which have not already ended, and ends the section. The sectionIdentifier, sessionIdentifiers, and sessionStates returned from previous requests related to the section become invalid. The delivery engine should not make any further requests related to the section or any session for the section. For a REST-based binding this request uses the DELETE HTTP method because of REST conventions, but the CAT engine is not required to physically delete any session or section data. This request should not be repeated once it has succeeded. 
+            parameters: 
+                - name: sectionIdentifier
+                  in: path
+                  description: |
+                      The LUID that identifies the Section to be deleted on the CAT Engine.
+                  required: true
+                  schema: 
+                      type: string
+                  style: simple
+            security:
+                - OAuth2CCG:
+                    - https://purl.imsglobal.org/cat/v1p0/scope/api
+                    - https://purl.imsglobal.org/cat/v1p0/scope/configure
+            responses: 
+                "204" : 
+                    description: |
+                        The response code for when the identified Section has been deleted in the CAT Engine. There is no response payload.
+                "400" : 
+                    description: |
+                        The request has been declared as 'bad'.  This will be due to the provision of bad data in the request payloads, including  a poorly formed JSON payload. This is accompanied by the 'codeMajor/severity' values of 'failure/error'.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "401" : 
+                    description: |
+                        The request was not correctly authorized i.e. 'unauthorisedrequest'. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. 
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "404" : 
+                    description: |
+                        The supplied identifier is unknown in the CAT Engine and so the object could not be processed. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. The statement 'Unknown Object' of should also be presented.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "500" : 
+                    description: |
+                        This code should be used only if there is catastrophic error and there is not a more appropriate code i.e. 'internal_server_error'. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. 
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "default" : 
+                    description: |
+                        This is the response data payload to be supplied when the HTTP code is NOT explicitly defined. This would be accompanied by the 'codeMajor/severity' values of 'failure/error' and the appropriate 'codeMinor' value. The associated HTTP code will also be supplied.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+
+    /sections/{sectionIdentifier}/sessions:
+        post:
+            operationId: createSession
+            summary: The REST createbp request message for the createSession() API call.
+            tags: 
+                - SessionsManager
+            description: |
+                This request initializes a candidate session for the adaptive section. The request optionally provides the CAT engine with information related to the candidate. The CAT engine returns the initial stage (list of items) to be presented to the candidate. This request may be made multiple times after a successful Create Section request, once per candidate, when each candidate enters the adaptive section on the test. This request is NOT idempotent.
+            parameters: 
+                - name: sectionIdentifier
+                  in: path
+                  description: |
+                      The LUID that identifies the Section in the CAT Engine to which this new Session is to be assigned.
+                  required: true
+                  schema: 
+                      type: string
+                  style: simple
+            security:
+                - OAuth2CCG:
+                    - https://purl.imsglobal.org/cat/v1p0/scope/api
+                    - https://purl.imsglobal.org/cat/v1p0/scope/deliver
+            requestBody:
+                description: |
+                    The Session configuration data including the information about the examinee.
+                content: 
+                    application/json: 
+                        schema: 
+                            $ref: "#/components/schemas/SessionDType"
+                required: true
+            responses: 
+                "201" : 
+                    description: |
+                        The response code for when the new Session has been created in the CAT Engine and the associated identifier has been returned. The response message consists of the identifier allocated to the session, the initial set of Items to be presented and the session state to be used for later requests.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/CreateSessionResponseBodyDType"
+                "400" : 
+                    description: |
+                        The request has been declared as 'bad'.  This will be due to the provision of bad data in the request payloads, including  a poorly formed JSON payload. This is accompanied by the 'codeMajor/severity' values of 'failure/error'.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "401" : 
+                    description: |
+                        The request was not correctly authorized i.e. 'unauthorisedrequest'. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. 
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "404" : 
+                    description: |
+                        The supplied identifier is unknown in the CAT Engine and so the object could not be processed. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. The statement 'Unknown Object' of should also be presented.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "500" : 
+                    description: |
+                        This code should be used only if there is catastrophic error and there is not a more appropriate code i.e. 'internal_server_error'. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. 
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "default" : 
+                    description: |
+                        This is the response data payload to be supplied when the HTTP code is NOT explicitly defined. This would be accompanied by the 'codeMajor/severity' values of 'failure/error' and the appropriate 'codeMinor' value. The associated HTTP code will also be supplied.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+
+    /sections/{sectionIdentifier}/sessions/{sessionIdentifier}:
+        delete:
+            operationId: endSession
+            summary: The REST delete request message for the endSession() API call.
+            tags: 
+                - SessionsManager
+            description: |
+                This request ends the candidate session. The sessionIdentifier, and the sessionState returned from any previous request in the session, become invalid. The delivery engine should not make any further requests related to the session. For a REST-based binding this request uses the DELETE HTTP method because of REST conventions; but it is not required that CAT engines physically delete data or resources associated with the session. If the identified session cannot be found then the 'unknownobject' status code must be reported.
+            parameters: 
+                - name: sectionIdentifier
+                  in: path
+                  description: |
+                      The LUID that identifies the Section to be deleted on the CAT Engine.
+                  required: true
+                  schema: 
+                      type: string
+                  style: simple
+                - name: sessionIdentifier
+                  in: path
+                  description: |
+                      The LUID that identifies the Session, in the context of the identified Section, to be deleted on the CAT Engine.
+                  required: true
+                  schema: 
+                      type: string
+                  style: simple
+            security:
+                - OAuth2CCG:
+                    - https://purl.imsglobal.org/cat/v1p0/scope/api
+                    - https://purl.imsglobal.org/cat/v1p0/scope/deliver
+            responses: 
+                "204" : 
+                    description: |
+                        The response code for when the identified Session has been deleted in the CAT Engine. There is no response payload.
+                "400" : 
+                    description: |
+                        The request has been declared as 'bad'.  This will be due to the provision of bad data in the request payloads, including  a poorly formed JSON payload. This is accompanied by the 'codeMajor/severity' values of 'failure/error'.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "401" : 
+                    description: |
+                        The request was not correctly authorized i.e. 'unauthorisedrequest'. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. 
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "404" : 
+                    description: |
+                        The supplied identifier is unknown in the CAT Engine and so the object could not be processed. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. The statement 'Unknown Object' of should also be presented.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "500" : 
+                    description: |
+                        This code should be used only if there is catastrophic error and there is not a more appropriate code i.e. 'internal_server_error'. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. 
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "default" : 
+                    description: |
+                        This is the response data payload to be supplied when the HTTP code is NOT explicitly defined. This would be accompanied by the 'codeMajor/severity' values of 'failure/error' and the appropriate 'codeMinor' value. The associated HTTP code will also be supplied.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+
+    /sections/{sectionIdentifier}/sessions/{sessionIdentifier}/results:
+        post:
+            operationId: submitResults
+            summary: The REST update request message for the submitResults() API call.
+            tags: 
+                - SessionsManager
+            description: |
+                This request sends the results from the current item stage in a candidate session to the CAT engine. The CAT engine returns its computed outcome variable values for the current stage and the test as a whole. It also returns the next item stage to be presented to the candidate. Instead of the next item stage, it may also return an indication that the adaptive section has ended, by returning an empty list for nextItems. If the identified Section/Session cannot be found then the 'unknownobject' status code must be reported.
+            parameters: 
+                - name: sectionIdentifier
+                  in: path
+                  description: |
+                      The LUID that identifies the Section in the CAT Engine to be used.
+                  required: true
+                  schema: 
+                      type: string
+                  style: simple
+                - name: sessionIdentifier
+                  in: path
+                  description: |
+                      The LUID that identifies the Session, in the context of the Section, in the CAT Engine to be used.
+                  required: true
+                  schema: 
+                      type: string
+                  style: simple
+            security:
+                - OAuth2CCG:
+                    - https://purl.imsglobal.org/cat/v1p0/scope/api
+                    - https://purl.imsglobal.org/cat/v1p0/scope/deliver
+            requestBody:
+                description: |
+                    The set of results that have been obtained, so far, by the examinee for the identified session.
+                content: 
+                    application/json: 
+                        schema: 
+                            $ref: "#/components/schemas/ResultsDType"
+                required: true
+            responses: 
+                "201" : 
+                    description: |
+                        The response code for when the next set of Items to be presented to the examinee has been returned. The response message contains the next set of Items, the session state to be used in later requests and, optionally, the assessment results.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/SubmitResultsResponseBodyDType"
+                "400" : 
+                    description: |
+                        The request has been declared as 'bad'.  This will be due to the provision of bad data in the request payloads, including  a poorly formed JSON payload. This is accompanied by the 'codeMajor/severity' values of 'failure/error'.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "401" : 
+                    description: |
+                        The request was not correctly authorized i.e. 'unauthorisedrequest'. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. 
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "404" : 
+                    description: |
+                        The supplied identifier is unknown in the CAT Engine and so the object could not be processed. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. The statement 'Unknown Object' of should also be presented.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "500" : 
+                    description: |
+                        This code should be used only if there is catastrophic error and there is not a more appropriate code i.e. 'internal_server_error'. This would be accompanied by the 'codeMajor/severity' values of 'failure/error'. 
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+                "default" : 
+                    description: |
+                        This is the response data payload to be supplied when the HTTP code is NOT explicitly defined. This would be accompanied by the 'codeMajor/severity' values of 'failure/error' and the appropriate 'codeMinor' value. The associated HTTP code will also be supplied.
+                    content: 
+                        application/json: 
+                            schema: 
+                                $ref: "#/components/schemas/imsx_StatusInfoDType"
+
+
+#####################################################################################
+#                               Components                                          #
+#####################################################################################
+components:
+    securitySchemes:
+        OAuth2CCG:
+            type: oauth2
+            description: |
+                A CAT engine implementation may adopt any scope structure and naming scheme which meets its requirements, including not using scopes at all. The scopes shown here are recommended, not required.
+            flows:
+                clientCredentials:
+                    tokenUrl: https://www.service-dependent.com/oauth2Token
+                    scopes: 
+                        https://purl.imsglobal.org/cat/v1p0/scope/api: This enables access to all of the endpoints.
+                        https://purl.imsglobal.org/cat/v1p0/scope/configure: This enables access to the endoints that permit the management of Sections.
+                        https://purl.imsglobal.org/cat/v1p0/scope/deliver: This enables access to the endoints that permit the management of Sessions.
+    schemas: 
+        CreateSessionResponseBodyDType:
+            description: |
+                The response code for when the new Session has been created in the CAT Engine and the associated identifier has been returned. The response message consists of the identifier allocated to the session, the initial set of Items to be presented and the session state to be used for later requests.
+            type: object
+            properties: 
+                sessionIdentifier:
+                    description: Model Primitive Datatype = NCName.
+                    type: string
+                nextItems:
+                    $ref: "#/components/schemas/NextItemSetDType"
+                sessionState:
+                    description: Model Primitive Datatype = NormalizedString.
+                    type: string
+            additionalProperties: false
+        GetSectionResponseBodyDType:
+            description: |
+                The response code for when the list of Items in the section's item pool has been returned. The response message contains the list of Items, the section configuration used to create the section, and any qtiUsagedata and qtiMetadata used to create the section.
+            type: object
+            properties: 
+                items:
+                    $ref: "#/components/schemas/ItemSetDType"
+                section:
+                    $ref: "#/components/schemas/SectionDType"
+            additionalProperties: false
+        SubmitResultsResponseBodyDType:
+            description: |
+                The response code for when the next set of Items to be presented to the examinee has been returned. The response message contains the next set of Items, the session state to be used in later requests and, optionally, the assessment results.
+            type: object
+            properties: 
+                nextItems:
+                    $ref: "#/components/schemas/NextItemSetDType"
+                assessmentResult:
+                    $ref: "#/components/schemas/AssessmentResultDType"
+                sessionState:
+                    description: Model Primitive Datatype = NormalizedString.
+                    type: string
+            additionalProperties: false
+        CreateSectionResponseBodyDType:
+            description: |
+                The response code for when the new Section has been created in the CAT Engine and the associated identifier has been returned.
+            type: object
+            properties: 
+                sectionIdentifier:
+                    description: Model Primitive Datatype = NCName.
+                    type: string
+            additionalProperties: false
+        AssessmentResultDType:
+            description: |
+                An Assessment Result is used to report the results of a candidate's interaction with a test and/or one or more items attempted. Information about the test is optional, in some systems it may be possible to interact with items that are not organized into a test at all. For example, items that are organized with learning resources and presented individually in a formative context.
+            type: object
+            properties: 
+                context: 
+                    $ref: "#/components/schemas/ContextDType"
+                testResult: 
+                    $ref: "#/components/schemas/TestResultDType"
+                itemResult: 
+                    description: |
+                        When a test result is given the following item results must relate only to items that were selected for presentation as part of the corresponding test session. Furthermore, all items selected for presentation should be reported with a corresponding itemResult.
+                    type: array
+                    minItems: 0
+                    items: 
+                        $ref: "#/components/schemas/ItemResultDType"
+            additionalProperties: false
+        CandidateResponseDType:
+            description: |
+                The response given by the candidate.
+            type: object
+            properties: 
+                value: 
+                    description: |
+                        The value(s) of the response variable. A NULL value, resulting from no response, is indicated by the absence of any value. The order of the values is significant only if the response was declared with ordered cardinality.
+                    type: array
+                    minItems: 0
+                    items: 
+                        $ref: "#/components/schemas/ValueDType"
+            additionalProperties: false
+        ContextDType:
+            description: |
+                This is the context for the 'assessmentResult'. It provides the corresponding set of identifiers.
+            type: object
+            properties: 
+                sourcedId: 
+                    description: A unique identifier for the test candidate. Model Primitive Datatype = NCName.
+                    type: string
+                sessionIdentifiers: 
+                    description: |
+                        The system that creates the result (for example, the test delivery system) should assign a session identifier that it can use to identify the session. Subsequent systems that process the result might assign their own identifier to the session which should be added to the context if the result is modified and exported for transport again.
+                    type: array
+                    minItems: 0
+                    items: 
+                        $ref: "#/components/schemas/SessionIdentifierDType"
+            additionalProperties: false
+        CorrectResponseDType:
+            description: |
+                The correct response may be output as part of the report if desired. Systems are not limited to reporting correct responses declared in responseDeclarations. For example, a correct response may be set by a templateRule or may simply have been suppressed from the declaration passed to the delivery engine e.g. for security.
+            type: object
+            properties: 
+                interpretation: 
+                    description: A human readable interpretation of the correct value. Model Primitive Datatype = String.
+                    type: string
+                value: 
+                    description: |
+                        The order of the values is signficant only when the response is of ordered cardinality.
+                    type: array
+                    minItems: 0
+                    items: 
+                        $ref: "#/components/schemas/ValueDType"
+            additionalProperties: false
+        ItemResultDType:
+            description: |
+                The result of an item session is reported with an itemResult. A report may contain multiple results for the same instance of an item representing multiple attempts, progression through an adaptive item or even more detailed tracking. In these cases, each item result must have a different datestamp.
+            type: object
+            required: 
+                - identifier
+                - datestamp
+                - sessionStatus
+            properties: 
+                identifier: 
+                    description: The identifier of the item for which this is a result. For item results that are reported as part of a test result this is the identifier used to refer to the item in the test (see assessmentItemRef). For item results that are reported on their own, this can be any suitable identifier for the item. Where possible, the value should match the identifier attribute on the associated assessmentItem. Model Primitive Datatype = NCName.
+                    type: string
+                sequenceIndex: 
+                    description: For item results that are reported as part of a test, this attribute must be used to indicate the position of the item within the specific instance of the test. The first item of the first part of the test is defined to have sequence index 1. Model Primitive Datatype = NonNegativeInteger.
+                    type: integer
+                    format: int32
+                    minimum: 0
+                datestamp: 
+                    description: The date stamp of when this result was recorded. Model Primitive Datatype = DateTime.
+                    type: string
+                    format: date-time
+                sessionStatus: 
+                    description: |
+                        The session status is used to interpret the values of the item variables. See the sessionStatus vocabulary.
+                    type: string
+                    enum: 
+                       - final
+                       - initial
+                       - pendingResponseProcessing
+                       - pendingSubmission
+                responseVariables: 
+                    description: |
+                        Indicates that a Response Variable is being reported. This is the value of one of the responses associated with an Item in the corresponding ASI instance.
+                    type: array
+                    minItems: 0
+                    items: 
+                        $ref: "#/components/schemas/ResponseVariableDType"
+                templateVariables: 
+                    description: |
+                        Indicates that a Template Variable is being reported. This is the value of one of the template variables associated with an Item in the corresponding ASI instance.
+                    type: array
+                    minItems: 0
+                    items: 
+                        $ref: "#/components/schemas/TemplateVariableDType"
+                outcomeVariables: 
+                    description: |
+                        Indicates that an Outcome Variable is being reported. This is the value of one of the outcomes associated with either an Item or Test and defined in the corresponding ASI instance.
+                    type: array
+                    minItems: 0
+                    items: 
+                        $ref: "#/components/schemas/OutcomeVariableDType"
+                candidateComment: 
+                    description: An optional comment supplied by the candidate (see the allowComment in the ASI documentation [QTI, 20a]). Model Primitive Datatype = String.
+                    type: string
+            additionalProperties: false
+        ItemSetDType:
+            description: |
+                A set of Item identfiers.
+            type: object
+            required: 
+                - itemIdentifiers
+            properties: 
+                itemIdentifiers: 
+                    description: |
+                        The Identifiers for the set of Items. These should be the GUIDs that have been assigned to AssessmentItems when defined using IMS QTI. Model Primitive Datatype = NCName.
+                    type: array
+                    minItems: 1
+                    items: 
+                        type: string
+            additionalProperties: false
+        KeyValuePairDType:
+            description: |
+                The container for the values assigned to the Key/Value pair.
+            type: object
+            required: 
+                - key
+                - value
+            properties: 
+                glossaryURI: 
+                    description: This is a URI to the definition of the data being supplied in this accompanying key/value pair. This definition should provide a human readable description of the data-type and value space for the value being identified by its key.  Model Primitive Datatype = AnyURI.
+                    type: string
+                    format: uri
+                key: 
+                    description: The key for the value to be supplied. Model Primitive Datatype = String.
+                    type: string
+                value: 
+                    description: The value being supplied. Model Primitive Datatype = String.
+                    type: string
+            additionalProperties: false
+        NextItemSetDType:
+            description: |
+                The container for the information about the set of next Items that should be presented to the examinee.
+            type: object
+            required: 
+                - itemIdentifiers
+            properties: 
+                itemIdentifiers: 
+                    description: |
+                        The Identifiers for the set of Items that should be presented next. These should be the GUIDs that have been assigned to AssessmentItems when defined using IMS QTI. Model Primitive Datatype = NCName.
+                    type: array
+                    minItems: 1
+                    items: 
+                        type: string
+                stageLength: 
+                    description: The (minimum) number of items the CAT Engine can present before requesting next items Model Primitive Datatype = NonNegativeInteger.
+                    type: integer
+                    format: int32
+                    minimum: 0
+            additionalProperties: false
+        OutcomeVariableDType:
+            description: |
+                The Item result information related to an 'Outcome Variable'.
+            type: object
+            required: 
+                - identifier
+                - cardinality
+            properties: 
+                identifier: 
+                    description: The identifier of the Outcome Variable. Model Primitive Datatype = NCName.
+                    type: string
+                cardinality: 
+                    description: |
+                        The cardinality of the Outcome Variable, taken from the corresponding declaration or definition.
+                    type: string
+                    enum: 
+                       - multiple
+                       - ordered
+                       - record
+                       - single
+                baseType: 
+                    description: |
+                        The base type of the Outcome Variable, taken from the corresponding declaration of definition. This value is omitted only for variables with record cardinality.
+                    type: string
+                    enum: 
+                       - boolean
+                       - directedPair
+                       - duration
+                       - file
+                       - float
+                       - identifier
+                       - integer
+                       - pair
+                       - point
+                       - string
+                       - uri
+                view: 
+                    description: |
+                        The views (if any) declared for the outcome must be copied to the report to enable systems that render the report to hide information not relevant in a specific situation. If no values are given, the outcome's value should be considered relevant in all views.
+                    type: array
+                    minItems: 0
+                    items: 
+                        type: string
+                        enum: 
+                           - author
+                           - candidate
+                           - proctor
+                           - scorer
+                           - testConstructor
+                           - tutor
+                interpretation: 
+                    description: A human readable interpretation of the default value. Model Primitive Datatype = String.
+                    type: string
+                longInterpretation: 
+                    description: An optional link to an extended interpretation of the outcome variable's value. Model Primitive Datatype = AnyURI.
+                    type: string
+                    format: uri
+                normalMaximum: 
+                    description: The normalMaximum attribute optionally defines the maximum magnitude of numeric outcome variables, it must be a positive value. If given, the outcome's value can be divided by normalMaximum and then truncated (if necessary) to obtain a normalized score in the range [-1.0,1.0]. normalMaximum has no affect on responseProcessing or the values that the outcome variable itself can take. Model Primitive Datatype = Double.
+                    type: number
+                    format: double
+                normalMinimum: 
+                    description: The normalMinimum attribute optionally defines the minimum value of numeric outcome variables, it may be negative. Model Primitive Datatype = Double.
+                    type: number
+                    format: double
+                masteryValue: 
+                    description: The masteryValue attribute optionally defines a value for numeric outcome variables above which the aspect being measured is considered to have been mastered by the candidate. Model Primitive Datatype = Double.
+                    type: number
+                    format: double
+                value: 
+                    description: |
+                        The value(s) of the outcome variable. The order of the values is significant only if the outcome was declared with ordered cardinality.
+                    type: array
+                    minItems: 0
+                    items: 
+                        $ref: "#/components/schemas/ValueDType"
+            additionalProperties: false
+        PCIContextDType:
+            description: |
+                This is the container for the contextual information that can be supplied for a PCI used within an Item. The contained information is only relevant when there is an 'interactionType' of 'portableCustomInteraction'.
+            type: object
+            properties: 
+                customTypeIdentifier: 
+                    description: This is used alongside an 'interactionType' value of 'portableCustomInteraction' to disambiguate which class of PCI is in use as PCIs can vary widely in terms of how they might need to be psychometrically analyzed. This field could potentially also be used to identify which type of a traditional customInteraction is in use by the item. Model Primitive Datatype = NormalizedString.
+                    type: string
+                interactionKind: 
+                    description: This is used to provide insight into the nature of the PCI e.g. this is a PCI which allows a user to add notes to a musical stave to author some music that might be given a description of 'authoring'. This information could be used by a psychometrician, etc. as an indication of a similar type of standard interaction. Model Primitive Datatype = NormalizedString.
+                    type: string
+            additionalProperties: false
+        QTIMetadataDType:
+            description: |
+                This contains the new category of metadata for the recording of QTI specific information.
+            type: object
+            properties: 
+                itemTemplate: 
+                    description: True if the item is actually an item template, in other words, the item changes its appearance based on some random or external factor. An assessmentItem that contains a templateProcessing section. Model Primitive Datatype = Boolean.
+                    type: boolean
+                timeDependent: 
+                    description: Whether or not the item is time dependent. A time dependent item takes the length of time taken for an attempt into consideration when scoring. Model Primitive Datatype = Boolean.
+                    type: boolean
+                composite: 
+                    description: True if the item comprises more than one interaction, for example, an assessmentItem that contains more than one interaction. Model Primitive Datatype = Boolean.
+                    type: boolean
+                interactionType: 
+                    description: |
+                        The interaction type(s) of the item. The vocabulary is comprised of the names, as defined in the information model, of the leaf classes derived from interaction.
+                    type: array
+                    minItems: 0
+                    items: 
+                        type: string
+                        enum: 
+                           - associateInteraction
+                           - choiceInteraction
+                           - customInteraction
+                           - drawingInteraction
+                           - endAttemptInteraction
+                           - extendedTextInteraction
+                           - gapMatchInteraction
+                           - graphicAssociateInteraction
+                           - graphicGapMatchInteraction
+                           - graphicOrderInteraction
+                           - hotspotInteraction
+                           - hottextInteraction
+                           - inlineChoiceInteraction
+                           - matchInteraction
+                           - mediaInteraction
+                           - orderInteraction
+                           - portableCustomInteraction
+                           - positionObjectInteraction
+                           - selectPointInteraction
+                           - sliderInteraction
+                           - textEntryInteraction
+                           - uploadInteraction
+                portableCustomInteractionContext: 
+                    $ref: "#/components/schemas/PCIContextDType"
+                feedbackType: 
+                    description: |
+                        Describes the type of feedback, if any, available in the item. If feedback is available then it is described as being non-adaptive or adaptive depending on whether the item is itself adaptive. A non-adaptive item generates feedback based on the responses submitted as part of (the last) attempt only. An adaptive item generates feedback that takes into consideration the path taken through the item, in other words, feedback based on the accumulation of all attempts and not just the last.
+                    type: string
+                    enum: 
+                       - adaptive
+                       - nonadaptive
+                       - none
+                solutionAvailable: 
+                    description: Set to true if a model solution is available for the item. For example, an assessmentItem that provides correct responses for all declared response variables. Model Primitive Datatype = Boolean.
+                    type: boolean
+                scoringMode: 
+                    description: |
+                        The scoringMode is used to denote that the way in which the scoring is achieved. If the Item includes the response processing then the mode is 'responseprocessing'. If human scoring is required the value is 'human' and if some form of machine processing is required then the value is 'externalmachine'.
+                    type: array
+                    minItems: 0
+                    items: 
+                        type: string
+                        enum: 
+                           - human
+                           - externalmachine
+                           - responseprocessing
+                toolName: 
+                    description: The name of the tool used to author the evaluation object. Model Primitive Datatype = String.
+                    type: string
+                toolVersion: 
+                    description: The version of the tool used to author the evaluation object. Model Primitive Datatype = String.
+                    type: string
+                toolVendor: 
+                    description: The company which produced the tool used to author the evaluation object. Model Primitive Datatype = String.
+                    type: string
+            additionalProperties: false
+        ResponseVariableDType:
+            description: |
+                The Item result information related to a 'Response Variable'.
+            type: object
+            required: 
+                - identifier
+                - cardinality
+                - candidateResponse
+            properties: 
+                identifier: 
+                    description: The identifier of the Response Variable. Model Primitive Datatype = NCName.
+                    type: string
+                cardinality: 
+                    description: |
+                        The cardinality of the Response Variable, taken from the corresponding declaration or definition.
+                    type: string
+                    enum: 
+                       - multiple
+                       - ordered
+                       - record
+                       - single
+                baseType: 
+                    description: |
+                        The base type of the Response Variable, taken from the corresponding declaration of definition. This value is omitted only for variables with record cardinality.
+                    type: string
+                    enum: 
+                       - boolean
+                       - directedPair
+                       - duration
+                       - file
+                       - float
+                       - identifier
+                       - integer
+                       - pair
+                       - point
+                       - string
+                       - uri
+                choiceSequence: 
+                    description: |
+                        When a response variable is bound to an interaction that supports the shuffling of choices, the sequence of choices experienced by the candidate will vary between test instances. When shuffling is in effect, the sequence of choices should be reported as a sequence of choice identifiers using this attribute. Model Primitive Datatype = NCName.
+                    type: array
+                    minItems: 0
+                    items: 
+                        type: string
+                correctResponse: 
+                    $ref: "#/components/schemas/CorrectResponseDType"
+                candidateResponse: 
+                    $ref: "#/components/schemas/CandidateResponseDType"
+            additionalProperties: false
+        ResultsDType:
+            description: |
+                This is the container for the results that have been accrued by the examinee. These are passed to the CAT Engine to support the selection of the next set of Items.
+            type: object
+            required: 
+                - assessmentResult
+            properties: 
+                assessmentResult: 
+                    $ref: "#/components/schemas/AssessmentResultDType"
+                sessionState: 
+                    description: The session state information. This is the data that was supplied by the CAT Engine when the session was created or the next set of Items was requested. Model Primitive Datatype = NormalizedString.
+                    type: string
+            additionalProperties: false
+        SectionDType:
+            description: |
+                The container for the definition of the Section that is to be created in the CAT Engine. A Section is aligned to a QTI AssessmentSection [QTI, 20a].
+            type: object
+            required: 
+                - sectionConfiguration
+            properties: 
+                qtiMetadata: 
+                    $ref: "#/components/schemas/QTIMetadataDType"
+                qtiUsagedata: 
+                    description: This is the Base64 encoded XML conforming to IMS QTI 3.0 Usage Date data model [QTI, 20c]. Model Primitive Datatype = String.
+                    type: string
+                sectionConfiguration: 
+                    description: This is the Base64 encoded data containing section configuration, aligned with adaptive engine (black box). This format will be proprietary to each adaptive CAT Engine. Model Primitive Datatype = String.
+                    type: string
+            additionalProperties: false
+        SessionDType:
+            description: |
+                This is the container for the session configuration data that must be supplied to the CAT Engine when the session is to be created.
+            type: object
+            properties: 
+                personalNeedsAndPreferences: 
+                    description: This is the Base64 encoded XML data for the Personal Needs and Preferences (PNP) for the examinee.  This data conforms to the XML as defined in the IMS Access for All Personal Needs and Preferences (AfAPNP) 3.0 XML Binding specification [AFAPNP, 20]. Model Primitive Datatype = NormalizedString.
+                    type: string
+                demographics: 
+                    description: The Base64 encoding of the JSON data for the Demographics information for the examinee. This data conforms to the JSON as defined in the IMS OneRoster 1.1 specification [OR, 17]. Model Primitive Datatype = NormalizedString.
+                    type: string
+                priorData: 
+                    description: |
+                        This is proprietary data that is supplied to the CAT Engine as a key/value pairs.
+                    type: array
+                    minItems: 0
+                    items: 
+                        $ref: "#/components/schemas/KeyValuePairDType"
+            additionalProperties: false
+        SessionIdentifierDType:
+            description: |
+                The system that creates the result (for example, the test delivery system) should assign a session identifier that it can use to identify the session.
+            type: object
+            required: 
+                - sourceID
+                - identifier
+            properties: 
+                sourceID: 
+                    description: A unique identifier of the system which added this identifier to the result. Model Primitive Datatype = AnyURI.
+                    type: string
+                    format: uri
+                identifier: 
+                    description: The system that creates the report should add a session identifier. Subsequent systems that process the results might use their own identifier for the session and should add this too if the result is exported again for further transport. Model Primitive Datatype = NCName.
+                    type: string
+            additionalProperties: false
+        TemplateVariableDType:
+            description: |
+                The Item result information related to a 'Template Variable'.
+            type: object
+            required: 
+                - identifier
+                - cardinality
+            properties: 
+                identifier: 
+                    description: The identifier of the Template Variable. Model Primitive Datatype = NCName.
+                    type: string
+                cardinality: 
+                    description: |
+                        The cardinality of the Template Variable, taken from the corresponding declaration or definition.
+                    type: string
+                    enum: 
+                       - multiple
+                       - ordered
+                       - record
+                       - single
+                baseType: 
+                    description: |
+                        The base type of the Template Variable, taken from the corresponding declaration of definition. This value is omitted only for variables with record cardinality.
+                    type: string
+                    enum: 
+                       - boolean
+                       - directedPair
+                       - duration
+                       - file
+                       - float
+                       - identifier
+                       - integer
+                       - pair
+                       - point
+                       - string
+                       - uri
+                value: 
+                    description: |
+                        The value(s) of the template variable. The order of the values is significant only if the template variable was declared with ordered cardinality.
+                    type: array
+                    minItems: 0
+                    items: 
+                        $ref: "#/components/schemas/ValueDType"
+            additionalProperties: false
+        TestResultDType:
+            description: |
+                The container for the Test result. When a test result is given the following item results must relate only to items that were selected for presentation as part of the corresponding test session. Furthermore, all items selected for presentation should be reported with a corresponding itemResult.
+            type: object
+            required: 
+                - identifier
+                - datestamp
+            properties: 
+                identifier: 
+                    description: The identifier of the test for which this is a result. Model Primitive Datatype = NCName.
+                    type: string
+                datestamp: 
+                    description: The date stamp of when this result was recorded. Model Primitive Datatype = DateTime.
+                    type: string
+                    format: date-time
+                responseVariables: 
+                    description: |
+                        Indicates that a Response Variable is being reported. This is the value of one of the responses associated with an Item in the corresponding ASI instance [QTI, 20a].
+                    type: array
+                    minItems: 0
+                    items: 
+                        $ref: "#/components/schemas/ResponseVariableDType"
+                templateVariables: 
+                    description: |
+                        Indicates that a Template Variable is being reported. This is the value of one of the template variables associated with an Item in the corresponding ASI instance [QTI, 20a].
+                    type: array
+                    minItems: 0
+                    items: 
+                        $ref: "#/components/schemas/TemplateVariableDType"
+                outcomeVariables: 
+                    description: |
+                        Indicates that an Outcome Variable is being reported. This is the value of one of the outcomes associated with either an Item or Test and defined in the corresponding ASI instance [QTI, 20a].
+                    type: array
+                    minItems: 0
+                    items: 
+                        $ref: "#/components/schemas/OutcomeVariableDType"
+            additionalProperties: false
+        ValueDType:
+            description: |
+                A class that can represent a single value of any baseType in variable declarations and result reports. The base-type is defined by the baseType attribute of the declaration except in the case of variables with record cardinality.
+            type: object
+            required: 
+                - value
+            properties: 
+                fieldIdentifier: 
+                    description: This attribute is only used for specifying the field identifier for a value that forms part of a record. Model Primitive Datatype = NCName.
+                    type: string
+                baseType: 
+                    description: |
+                        This attribute is only used for specifying the base-type of a value that forms part of a record.
+                    type: string
+                    enum: 
+                       - boolean
+                       - directedPair
+                       - duration
+                       - file
+                       - float
+                       - identifier
+                       - integer
+                       - pair
+                       - point
+                       - string
+                       - uri
+                value: 
+                    description: The value being supplied. Model Primitive Datatype = NormalizedString.
+                    type: string
+            additionalProperties: false
+        imsx_CodeMinorDType:
+            description: |
+                This is the container for the set of code minor status codes reported in the responses from the Service Provider.
+            type: object
+            required: 
+                - imsx_codeMinorField
+            properties: 
+                imsx_codeMinorField: 
+                    description: |
+                        Each reported code minor status code.
+                    type: array
+                    minItems: 1
+                    items: 
+                        $ref: "#/components/schemas/imsx_CodeMinorFieldDType"
+            additionalProperties: false
+        imsx_CodeMinorFieldDType:
+            description: |
+                This is the container for a single code minor status code.
+            type: object
+            required: 
+                - imsx_codeMinorFieldName
+                - imsx_codeMinorFieldValue
+            properties: 
+                imsx_codeMinorFieldName: 
+                    description: This should contain the identity of the system that has produced the code minor status code report. Model Primitive Datatype = NormalizedString.
+                    type: string
+                imsx_codeMinorFieldValue: 
+                    description: |
+                        The code minor status code (this is a value from the corresponding enumerated vocabulary).
+                    type: string
+                    enum: 
+                       - fullsuccess
+                       - forbidden
+                       - invaliddata
+                       - unauthorisedrequest
+                       - internal_server_error
+                       - server_busy
+                       - unknownobject
+            additionalProperties: false
+        imsx_StatusInfoDType:
+            description: |
+                This is the container for the status code and associated information returned within the HTTP messages received from the Service Provider.
+            type: object
+            required: 
+                - imsx_codeMajor
+                - imsx_severity
+            properties: 
+                imsx_codeMajor: 
+                    description: |
+                        The code major value (from the corresponding enumerated vocabulary).
+                    type: string
+                    enum: 
+                       - success
+                       - processing
+                       - failure
+                       - unsupported
+                imsx_severity: 
+                    description: |
+                        The severity value (from the corresponding enumerated vocabulary).
+                    type: string
+                    enum: 
+                       - status
+                       - warning
+                       - error
+                imsx_description: 
+                    description: A human readable description supplied by the entity creating the status code information. Model Primitive Datatype = String.
+                    type: string
+                imsx_codeMinor: 
+                    $ref: "#/components/schemas/imsx_CodeMinorDType"
+            additionalProperties: false
