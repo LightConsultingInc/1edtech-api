@@ -94,7 +94,13 @@ export class DatabaseService {
         throw new Error(`Invalid environment [${env}] for db`);
       }
       const options = knexfile[env];
-      this.connection = knex(options);
+      this.connection = knex({
+        ...options,
+        connection: {
+          uri: options.connection,
+          multipleStatements: true,
+        },
+      });
     }
 
     if (process.env.NODE_ENV === 'test') {

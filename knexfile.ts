@@ -31,7 +31,7 @@ if (DATABASE_URL !== AWS_DB_URL) {
 module.exports = {
   development: {
     client: 'mysql2',
-    connection: DATABASE_URL,
+    connection: { uri: DATABASE_URL, multipleStatements: true },
   },
 
   test: {
@@ -44,11 +44,11 @@ module.exports = {
 
   staging: {
     client: 'mysql2',
-    connection: DATABASE_URL,
+    connection: { uri: DATABASE_URL, multipleStatements: true },
   },
 
   production: {
     client: 'mysql2',
-    connection: DATABASE_URL,
+    connection: { uri: DATABASE_URL, multipleStatements: true },
   },
 };
