@@ -1,0 +1,1995 @@
+openapi: 3.0.1
+info:
+  title: Comprehensive Learner Record Standard OpenAPI (YAML) Definition
+  description: 'The Comprehensive Learner Record Standard enables the exchange of data about users and their achievements between a Comprehensive Learner Record Standard provider and the consumers of the associated data. This standard has been described using the IMS Model Driven Specification development approach, this being the Platform Specific Model (PSM) of the service.'
+  termsOfService: https://www.imsglobal.org/license.html
+  contact:
+    name: 'Lisa Mattson (COO), IMS Global'
+    url: http://www.imsglobal.org
+    email: lmattson@imsglobal.org
+  license:
+    name: IMS Global
+    url: https://www.imsglobal.org/license.html
+  version: '1.0'
+servers:
+  - url: https://www.imsglobal.org/ims/clr/v1p0/
+    description: The above Server URL should be changed to the actual server location.
+paths:
+  '/assertions/{sourcedId}':
+    get:
+      tags:
+        - AssertionsManager
+      summary: The REST read request message for the getAssertion() API call.
+      description: "Returns the current version of the specified Assertion. This operation is used to verify a Hosted Assertion.\n"
+      operationId: getAssertion
+      parameters:
+        - name: sourcedId
+          in: path
+          description: "The unique identifier of the Assertion.\n"
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "'OK' - The resource is returned in the payload.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/GetAssertionPayloadDType'
+        '400':
+          description: "'Bad Request' - The request was invalid or cannot be served. The exact error should be explained in the payload.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '404':
+          description: "'Not Found' - The resource was not found.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '406':
+          description: "'Not Acceptable' - The request did not include 'application/ld+json' in the Accept header.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '421':
+          description: "'Misdirected Request' - The request was not made over secure TLS 1.2 or 1.3 protocol.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        default:
+          description: "The request was not completed successfully.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+  /clrs:
+    get:
+      tags:
+        - ClrsManager
+      summary: The REST read request message for the getClrs() API call.
+      description: "The set of CLRs the user is authorized to access are returned in the payload of the response message.\n"
+      operationId: getClrs
+      parameters:
+        - name: limit
+          in: query
+          description: "The number of results to return.\n"
+          style: form
+          explode: false
+          schema:
+            minimum: 1
+            type: integer
+            format: int32
+            default: 100
+        - name: offset
+          in: query
+          description: "The index of the first record to return. (zero indexed)\n"
+          style: form
+          explode: false
+          schema:
+            minimum: 0
+            type: integer
+            format: int32
+        - name: since
+          in: query
+          description: "Retrieve CLRs that were issued after the provided timestamp. Must be an ISO 8601 compatible timestamp with a time zone indicator.\n"
+          style: form
+          explode: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: "'OK' - The resource is returned in the payload.\n"
+          headers:
+            X-Total-Count:
+              description: "The total number of resources that are available to be returned\n"
+              schema:
+                type: integer
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/ClrSetDType'
+          links:
+            next:
+              operationId: getClrs
+              parameters:
+                limit: $request.path.limit
+                offset: $request.path.offset
+              description: "Get the next set of resources i.e. from offset to offset+limit\n"
+            last:
+              operationId: getClrs
+              parameters:
+                limit: $request.path.limit
+                offset: $request.path.offset
+              description: "Get the last set of resources i.e. from offset to end\n"
+            first:
+              operationId: getClrs
+              parameters:
+                limit: $request.path.limit
+                offset: $request.path.offset
+              description: "Get the first set of resources i.e. from first to limit\n"
+            prev:
+              operationId: getClrs
+              parameters:
+                limit: $request.path.limit
+                offset: $request.path.offset
+              description: "Get the previous set of resources i.e. from last_offset to last_offset+limit\n"
+        '400':
+          description: "'Bad Request' - The request was invalid or cannot be served. The exact error should be explained in the error payload.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '401':
+          description: "'Unauthorized' - The request requires user authentication.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '403':
+          description: "'Forbidden' - The server understood the request, but is refusing it or the access is not allowed.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '404':
+          description: "'Not Found' - There are no resources behind the URI.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '406':
+          description: "'Not Acceptable' - The request did not include 'application/ld+json' in the Accept header.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '421':
+          description: "'Misdirected Request' - The request was not made over secure TLS 1.2 or 1.3 protocol.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        default:
+          description: "The request was not completed successfully. The exact error should be explained in the error payload.\n"
+      security:
+        - OAuth2CCG:
+            - https://purl.imsglobal.org/spec/clr/v1p0/scope/readonly
+        - OAuth2ACG:
+            - https://purl.imsglobal.org/spec/clr/v1p0/scope/readonly
+    post:
+      tags:
+        - ClrsManager
+      summary: The REST createbp request message for the postClr() API call.
+      description: "Create or replace a CLR.\n"
+      operationId: postClr
+      requestBody:
+        description: "The CLR to be created or replaced.\n"
+        content:
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/PostClrPayloadDType'
+        required: true
+      responses:
+        '200':
+          description: "'OK' - The resource was successfully replaced.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/PostClrPayloadDType'
+        '201':
+          description: "'Created` - The resource was successfully created.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/PostClrPayloadDType'
+        '304':
+          description: "'Not Modified' - The client can use cached data.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '400':
+          description: "'Bad Request' - The request was invalid or cannot be served. The exact error should be explained in the error payload.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '401':
+          description: "'Unauthorized' - The request requires user authentication.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '403':
+          description: "'Forbidden' - The server understood the request, but is refusing it or the access is not allowed.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '404':
+          description: "'Not Found' - There is no resource behind the URI.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '405':
+          description: "'Method Not Allowed' - The provider does not support this operation.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '406':
+          description: "'Not Acceptable' - The request did not include 'application/ld+json' in the Accept header.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '421':
+          description: "'Misdirected Request' - The request was not made over secure TLS 1.2 or 1.3 protocol.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        default:
+          description: "The request was not completed successfully. The exact error should be explained in the error payload.\n"
+      security:
+        - OAuth2CCG:
+            - https://purl.imsglobal.org/spec/clr/v1p0/scope/replace
+        - OAuth2ACG:
+            - https://purl.imsglobal.org/spec/clr/v1p0/scope/replace
+  '/clrs/{sourcedId}':
+    delete:
+      tags:
+        - ClrsManager
+      summary: The REST delete request message for the deleteClr() API call.
+      description: "Delete a CLR.\n"
+      operationId: deleteClr
+      parameters:
+        - name: sourcedId
+          in: path
+          description: "The unique identifier of the CLR to delete.\n"
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "'OK' - The request succeeded and the resource was deleted.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '202':
+          description: "'Accepted' - The request was accepted and the resource will be deleted.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '204':
+          description: "'No Content' - The resource was successfully deleted.\n"
+        '400':
+          description: "'Bad Request' - The request was invalid or cannot be served. The exact error should be explained in the error payload.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '401':
+          description: "'Unauthorized' - The request requires an user authentication.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '403':
+          description: "'Forbidden' - The server understood the request, but is refusing it or the access is not allowed.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '404':
+          description: "'Not found' - There is no resource behind the URI.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '405':
+          description: "'Method Not Allowed' - The provider does not support this operation.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '406':
+          description: "'Not Acceptable' - The request did not include 'application/ld+json' in the Accept header.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '421':
+          description: "'Misdirected Request' - The request was not made over secure TLS 1.2 or 1.3 protocol.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        default:
+          description: "The request was not completed successfully. The exact error should be explained in the error payload.\n"
+      security:
+        - OAuth2CCG:
+            - https://purl.imsglobal.org/spec/clr/v1p0/scope/delete
+        - OAuth2ACG:
+            - https://purl.imsglobal.org/spec/clr/v1p0/scope/delete
+    get:
+      tags:
+        - ClrsManager
+      summary: The REST read request message for the getClr() API call.
+      description: "Returns the current version of the specified Clr. This operation is used to verify a Hosted Clr.\n"
+      operationId: getClr
+      parameters:
+        - name: sourcedId
+          in: path
+          description: "The unique identifier of the Clr.\n"
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "'OK' - The resource is returned in the payload.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/GetClrPayloadDType'
+        '400':
+          description: "'Bad Request' - The request was invalid or cannot be served. The exact error should be explained in the error payload.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '401':
+          description: "'Unauthorized' - The request requires user authentication.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '403':
+          description: "'Forbidden' - The server understood the request, but is refusing it or the access is not allowed.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '404':
+          description: "'Not Found' – There is no resource behind the URI.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '406':
+          description: "'Not Acceptable' - The request did not include 'application/ld+json' in the Accept header.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '410':
+          description: "'Gone' - Marks the entity as revoked. The response may include the entity body.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '421':
+          description: "'Misdirected Request' - The request was not made over secure TLS 1.2 or 1.3 protocol.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        default:
+          description: "The request was not completed successfully.\n"
+      security:
+        - OAuth2CCG:
+            - https://purl.imsglobal.org/spec/clr/v1p0/scope/readonly
+        - OAuth2ACG:
+            - https://purl.imsglobal.org/spec/clr/v1p0/scope/readonly
+  /discovery:
+    get:
+      tags:
+        - DiscoveryManager
+      summary: The REST read request message for the getDiscoveryDocument() API call.
+      description: "Returns the DiscoveryDocument if the provider supports dynamic CLR consumer registration.\n"
+      operationId: getDiscoveryDocument
+      responses:
+        '200':
+          description: "'OK' - The resource is returned in the payload.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/DiscoveryDocumentDType'
+        '404':
+          description: "'Not Found' - There is no resource behind the URI.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '406':
+          description: "'Not Acceptable' - The request did not include 'application/ld+json' in the Accept header.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '421':
+          description: "'Misdirected Request' - The request was not made over secure TLS 1.2 or 1.3 protocol.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        default:
+          description: "The request was not completed successfully.\n"
+  '/endorsements/{sourcedId}':
+    get:
+      tags:
+        - EndorsementsManager
+      summary: The REST read request message for the getEndorsement() API call.
+      description: "Returns the current version of the specified Endorsement. This operation is used to verify a Hosted Endorsement.\n"
+      operationId: getEndorsement
+      parameters:
+        - name: sourcedId
+          in: path
+          description: "The unique identifier of the Endorsement.\n"
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "'OK' - The resource is returned in the payload.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/GetEndorsementPayloadDType'
+        '400':
+          description: "'Bad Request' - The request was invalid or cannot be served. The exact error should be explained in the payload.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '404':
+          description: "'Not Found' - The resource was not found.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '406':
+          description: "'Not Acceptable' - The request did not include 'application/ld+json' in the Accept header.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '421':
+          description: "'Misdirected Request' - The request was not made over secure TLS 1.2 or 1.3 protocol.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        default:
+          description: "The request was not completed successfully.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+  '/keys/{sourcedId}':
+    get:
+      tags:
+        - KeysManager
+      summary: The REST read request message for the getKey() API call.
+      description: "Returns the current version of the specified CryptographicKey. This operation is used to verify a Signed Assertion, Clr, or Endorsement.\n"
+      operationId: getKey
+      parameters:
+        - name: sourcedId
+          in: path
+          description: "The unique identifier of the CryptographicKey.\n"
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "'OK' - The resource is returned in the payload.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/GetCryptographicKeyPayloadDType'
+        '400':
+          description: "'Bad Request' - The request was invalid or cannot be served. The exact error should be explained in the payload.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '404':
+          description: "'Not Found' - The resource was not found.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '406':
+          description: "'Not Acceptable' - The request did not include 'application/ld+json' in the Accept header.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '421':
+          description: "'Misdirected Request' - The request was not made over secure TLS 1.2 or 1.3 protocol.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        default:
+          description: "The request was not completed successfully.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+  '/revocations/{sourcedId}':
+    get:
+      tags:
+        - RevocationsManager
+      summary: The REST read request message for the getRevocationList() API call.
+      description: "Returns the current version of the issuer's RevocationList. This operation is used to verify a Signed Assertion, Clr, or Endorsement.\n"
+      operationId: getRevocationList
+      parameters:
+        - name: sourcedId
+          in: path
+          description: "The unique identifier of the RevocationList.\n"
+          required: true
+          style: simple
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "'OK' - The resource is returned in the payload.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/GetRevocationListPayloadDType'
+        '400':
+          description: "'Bad Request' - The request was invalid or cannot be served. The exact error should be explained in the payload.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '404':
+          description: "'Not Found' - The resource was not found.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '406':
+          description: "'Not Acceptable' - The request did not include 'application/ld+json' in the Accept header.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        '421':
+          description: "'Misdirected Request' - The request was not made over secure TLS 1.2 or 1.3 protocol.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+        default:
+          description: "The request was not completed successfully.\n"
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfoDType'
+components:
+  schemas:
+    AchievementDType:
+      required:
+        - id
+        - name
+        - issuer
+      type: object
+      properties:
+        id:
+          type: string
+          description: Globally unique IRI for the Achievement. If the IRI is a URL it must resolve to an Achievement resource. Model Primitive Datatype = NormalizedString.
+        type:
+          type: string
+          description: The JSON-LD type of this object. Normally 'Achievement'. Model Primitive Datatype = NormalizedString.
+        achievementType:
+          anyOf:
+            - enum:
+                - Achievement
+                - Assessment
+                - Assignment
+                - Award
+                - Badge
+                - Certificate
+                - Certification
+                - Course
+                - CommunityService
+                - Competency
+                - Co-Curricular
+                - Degree
+                - Diploma
+                - Fieldwork
+                - License
+                - Membership
+              type: string
+            - pattern: '(ext:)[a-zA-Z0-9\.\-_]+'
+              type: string
+              description: The data-type that enables an enumerated vocabulary to be extended. Model Primitive Datatype = String.
+          description: "A CLR Achievement can represent many different types of achievement from an assessment result to membership. Use 'Achievement' to indicate an achievement not in the list of allowed values.\n"
+        alignments:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/AlignmentDType'
+          description: "Alignment objects describe an alignment between this achievement and a node in an educational framework.\n"
+        associations:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/AssociationDType'
+          description: "Associations between this achievement and other achievements.\n"
+        creditsAvailable:
+          type: number
+          description: 'Credit hours associated with this entity, or credit hours possible. For example ''3.0''. Model Primitive Datatype = Float.'
+          format: float
+        description:
+          type: string
+          description: A short description of the achievement. May be the same as name if no description is available. Model Primitive Datatype = String.
+        endorsements:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/EndorsementDType'
+          description: "Allows endorsers to make specific claims about the Achievement.\n"
+        humanCode:
+          type: string
+          description: 'The code, generally human readable, associated with an achievement. Model Primitive Datatype = String.'
+        identifiers:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/SystemIdentifierDType'
+          description: "A set of System Identifiers that represent other identifiers for this Achievement.\n"
+        name:
+          type: string
+          description: The name of the achievement. Model Primitive Datatype = String.
+        fieldOfStudy:
+          type: string
+          description: 'Category, subject, area of study,  discipline, or general branch of knowledge. Examples include Business, Education, Psychology, and Technology.  Model Primitive Datatype = String.'
+        image:
+          type: string
+          description: IRI of an image representing the achievement. May be a Data URI or the URL where the image may be found. Model Primitive Datatype = NormalizedString.
+        issuer:
+          $ref: '#/components/schemas/ProfileDType'
+        level:
+          type: string
+          description: 'Text that describes the level of achievement apart from how the achievement was performed or demonstrated. Examples would include ''Level 1'', ''Level 2'', ''Level 3'', or ''Bachelors'', ''Masters'', ''Doctoral''. Model Primitive Datatype = String.'
+        requirement:
+          $ref: '#/components/schemas/CriteriaDType'
+        resultDescriptions:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/ResultDescriptionDType'
+          description: "The set of result descriptions that may be asserted as results with this achievement.\n"
+        signedEndorsements:
+          minItems: 0
+          type: array
+          items:
+            pattern: '^([A-Za-z0-9-_]{4,})\.([-A-Za-z0-9-_]{4,})\.([A-Za-z0-9-_]{4,})$'
+            type: string
+          description: "Signed endorsements in JWS Compact Serialization format. Model Primitive Datatype = String.\n"
+        specialization:
+          type: string
+          description: 'Name given to the focus, concentration, or specific area of study defined in the achievement. Examples include Entrepreneurship, Technical Communication, and Finance. Model Primitive Datatype = String.'
+        tags:
+          minItems: 0
+          type: array
+          items:
+            type: string
+          description: Tags that describe the type of achievement. Model Primitive Datatype = String.
+      description: "An accomplishment such as completing a degree, mastering a competency, or course completion that may be asserted about one or more learners.\n"
+    AddressDType:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique IRI for the Address. Model Primitive Datatype = NormalizedString.
+        type:
+          type: string
+          description: The JSON-LD type of this object. Normally 'Address'. Model Primitive Datatype = NormalizedString.
+        addressCountry:
+          type: string
+          description: 'The country. For example, USA. You can also provide the two-letter ISO 3166-1 alpha-2 country code. Model Primitive Datatype = String.'
+        addressLocality:
+          type: string
+          description: 'The locality. For example, Mountain View. Model Primitive Datatype = String.'
+        addressRegion:
+          type: string
+          description: 'The region. For example, CA. Model Primitive Datatype = String.'
+        postalCode:
+          type: string
+          description: 'The postal code. For example, 94043. Model Primitive Datatype = String.'
+        postOfficeBoxNumber:
+          type: string
+          description: The post office box number for PO box addresses. Model Primitive Datatype = String.
+        streetAddress:
+          type: string
+          description: 'The street address. For example, 1600 Amphitheatre Pkwy. Model Primitive Datatype = String.'
+      description: "Based on schema.org Address object.\n"
+    AlignmentDType:
+      required:
+        - targetName
+        - targetUrl
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique IRI for the object. Model Primitive Datatype = NormalizedString.
+        type:
+          type: string
+          description: The JSON-LD type of this entity. Normally 'Alignment'. Model Primitive Datatype = NormalizedString.
+        targetCode:
+          type: string
+          description: 'If applicable, a locally unique string identifier that identifies the alignment target within its framework. Model Primitive Datatype = String.'
+        targetDescription:
+          type: string
+          description: The description of a node in an established educational framework. Model Primitive Datatype = String.
+        targetName:
+          type: string
+          description: The name of a node in an established educational framework. Model Primitive Datatype = String.
+        targetFramework:
+          type: string
+          description: The name of the framework to which the resource being described is aligned. Model Primitive Datatype = String.
+        targetType:
+          anyOf:
+            - pattern: '(ext:)[a-zA-Z0-9\.\-_]+'
+              type: string
+              description: The data-type that enables an enumerated vocabulary to be extended. Model Primitive Datatype = String.
+            - enum:
+                - CFItem
+                - CFRubric
+                - CFRubricCriterion
+                - CFRubricCriterionLevel
+                - CTDL
+              type: string
+          description: "The type of the alignment target node. This is an extensible enumerated vocabulary. Extending the vocabulary makes use of a naming convention.\n"
+        targetUrl:
+          type: string
+          description: 'The URL of a node in an established educational framework. When the alignment is to a CASE framework and the CASE Service support the CASE JSON-LD binding, the URL should be the ''uri'' of the node document, otherwise the URL should be the CASE Service endpoint URL that returns the node JSON. Model Primitive Datatype = AnyURI.'
+          format: uri
+      description: "Alignment is based on the schema.org AlignmentObject.\n"
+    ArtifactDType:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The JSON-LD type of the object. Normally 'Artifact'. Model Primitive Datatype = NormalizedString.
+        description:
+          type: string
+          description: A description of the artifact. Model Primitive Datatype = String.
+        name:
+          type: string
+          description: The name of the artifact. Model Primitive Datatype = String.
+        url:
+          type: string
+          description: IRI of the artifact. May be a Data URI or the URL where the artifact may be found. Model Primitive Datatype = NormalizedString.
+      description: "An artifact that is part of an evidence object.\n"
+    AssertionDType:
+      required:
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: 'Globally unique IRI for the Assertion. If the IRI is a URL it must resolve to an Assertion resource. If the Assertion is verified using Hosted verification, the IRI must be a URL. Model Primitive Datatype = NormalizedString.'
+        type:
+          type: string
+          description: The JSON-LD type of this object. Normally 'Assertion'. Model Primitive Datatype = NormalizedString.
+        achievement:
+          $ref: '#/components/schemas/AchievementDType'
+        activityEndDate:
+          type: string
+          description: 'If present, end date for the activity. Model Primitive Datatype = DateTime.'
+          format: date-time
+        activityStartDate:
+          type: string
+          description: 'If present, start date for the activity. Model Primitive Datatype = DateTime.'
+          format: date-time
+        creditsEarned:
+          type: number
+          description: 'The number of credits earned, generally in semester or quarter credit hours.  This field correlates with the Achievement creditsAvailable field. Model Primitive Datatype = Float.'
+          format: float
+        endorsements:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/EndorsementDType'
+          description: "Allows endorsers to make specific claims about the assertion.\n"
+        evidence:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceDType'
+          description: "Evidence describing the work that the recipient did to earn the achievement. This can be a webpage that links out to other pages if linking directly to the work is infeasible.\n"
+        expires:
+          type: string
+          description: 'If the achievement has some notion of expiry, this indicates a timestamp when an assertion should no longer be considered valid. After this time, the assertion should be considered expired. Model Primitive Datatype = DateTime.'
+          format: date-time
+        image:
+          type: string
+          description: IRI of an image representing the assertion. May be a Data URI or the URL where the image may be found. Model Primitive Datatype = NormalizedString.
+        issuedOn:
+          type: string
+          description: Timestamp of when the achievement was awarded. Required unless the assertion is revoked. Model Primitive Datatype = DateTime.
+          format: date-time
+        licenseNumber:
+          type: string
+          description: The license number that was issued with this assertion. Model Primitive Datatype = String.
+        narrative:
+          type: string
+          description: A narrative that describes the connection between multiple pieces of evidence. Likely only present if evidence is a multi-value array. Markdown allowed. Model Primitive Datatype = String.
+        recipient:
+          $ref: '#/components/schemas/IdentityDType'
+        results:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/ResultDType'
+          description: "The set of results being asserted.\n"
+        revocationReason:
+          type: string
+          description: 'Optional published reason for revocation, if revoked. Model Primitive Datatype = String.'
+        revoked:
+          type: boolean
+          description: 'Defaults to false if this assertion is not referenced in a RevocationList. If revoked is true, only revoked and id are required properties, and many issuers strip a hosted assertion down to only those properties when revoked. Model Primitive Datatype = Boolean.'
+        role:
+          type: string
+          description: 'Role, position, or title of the learner when demonstrating or performing the achievement or evidence of learning being asserted. Examples include ''Student President'', ''Intern'', ''Captain'', etc. Model Primitive Datatype = String.'
+        signedEndorsements:
+          minItems: 0
+          type: array
+          items:
+            pattern: '^([A-Za-z0-9-_]{4,})\.([-A-Za-z0-9-_]{4,})\.([A-Za-z0-9-_]{4,})$'
+            type: string
+          description: "Signed endorsements in JWS Compact Serialization format. Model Primitive Datatype = String.\n"
+        source:
+          $ref: '#/components/schemas/ProfileDType'
+        term:
+          type: string
+          description: The academic term in which this assertion was achieved. Model Primitive Datatype = String.
+        verification:
+          $ref: '#/components/schemas/VerificationDType'
+      description: "Assertions are representations of an Achievement awarded to a Learner.  It is used to share information about the Achievement Assertion, such as a result and verification method. Assertions are packaged for transmission as JSON objects with a set of mandatory and optional properties.\n"
+    AssociationDType:
+      required:
+        - associationType
+        - targetId
+        - title
+      type: object
+      properties:
+        associationType:
+          enum:
+            - exactMatchOf
+            - exemplar
+            - hasSkillLevel
+            - isChildOf
+            - isParentOf
+            - isPartOf
+            - isPeerOf
+            - isRelatedTo
+            - precedes
+            - replacedBy
+          type: string
+          description: "The type of association. This uses an enumerated vocabulary.\n"
+        targetId:
+          type: string
+          description: 'The ''@id'' of another achievement, or target of the association. Model Primitive Datatype = NormalizedString.'
+        title:
+          type: string
+          description: A human readable title for the associated achievement. Model Primitive Datatype = String.
+      description: "Association is based on the CASE AssociationLink object. An Association associates (relates) one Achievement with another Achievement.\n"
+    ClrDType:
+      required:
+        - id
+        - issuedOn
+        - learner
+        - publisher
+      type: object
+      properties:
+        id:
+          type: string
+          description: 'Globally unique IRI for the CLR. If the IRI is a URL is must resolve to a CLR resource and conform to the getClr endpoint format. If the CLR is verified using Hosted verification, the IRI must be a URL. Model Primitive Datatype = NormalizedString.'
+        type:
+          type: string
+          description: The JSON-LD type of this object. Normally 'Clr'. Model Primitive Datatype = NormalizedString.
+        achievements:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/AchievementDType'
+          description: "Array of achievements that are related directly or indirectly through associations with the asserted achievements in the CLR. Primarily used to represent hierarchical pathways. Asserted achievements may appear in both this array and in the achievement assertion. If asserted achievements do appear in both places, they MUST match exactly.\n"
+        assertions:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/AssertionDType'
+          description: "The learner's asserted achievements.\n"
+        endorsements:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/EndorsementDType'
+          description: "Allows endorsers to make specific claims about the CLR, or any assertion, achievement, or profile referenced in the CLR.\n"
+        issuedOn:
+          type: string
+          description: Timestamp of when the CLR was published. Model Primitive Datatype = DateTime.
+          format: date-time
+        learner:
+          $ref: '#/components/schemas/ProfileDType'
+        name:
+          type: string
+          description: Optional name of the CLR. Model Primitive Datatype = String.
+        partial:
+          type: boolean
+          description: 'True if CLR does not contain all the assertions known by the publisher for the learner at the time the CLR is issued. Useful if you are sending a small set of achievements in real time when they are achieved. If False or omitted, the CLR SHOULD be interpreted as containing all the assertions for the learner known by the publisher at the time of issue. Model Primitive Datatype = Boolean.'
+        publisher:
+          $ref: '#/components/schemas/ProfileDType'
+        revocationReason:
+          type: string
+          description: 'If revoked, optional reason for revocation. Model Primitive Datatype = String.'
+        revoked:
+          type: boolean
+          description: If True the CLR is revoked. Model Primitive Datatype = Boolean.
+        signedAssertions:
+          minItems: 0
+          type: array
+          items:
+            pattern: '^([A-Za-z0-9-_]{4,})\.([-A-Za-z0-9-_]{4,})\.([A-Za-z0-9-_]{4,})$'
+            type: string
+          description: "Signed assertions in JWS Compact Serialization format. Model Primitive Datatype = String.\n"
+        signedEndorsements:
+          minItems: 0
+          type: array
+          items:
+            pattern: '^([A-Za-z0-9-_]{4,})\.([-A-Za-z0-9-_]{4,})\.([A-Za-z0-9-_]{4,})$'
+            type: string
+          description: "Signed endorsements of the CLR or any Achievement, Assertion, or Profile in the CLR; in JWS Compact Serialization format. Model Primitive Datatype = String.\n"
+        verification:
+          $ref: '#/components/schemas/VerificationDType'
+      description: "A collection of assertions for a single person reported by a single publisher.\n"
+    ClrSetDType:
+      required:
+        - '@context'
+      type: object
+      properties:
+        '@context':
+          oneOf:
+            - type: string
+              description: The context URL
+              format: uri
+            - type: array
+              items:
+                type: string
+                format: uri
+              description: Array of context URLs
+          description: JSON-LD Context
+        id:
+          type: string
+          description: Unique IRI for the ClrSet. Model Primitive Datatype = NormalizedString.
+        type:
+          type: string
+          description: The JSON-LD type of this object. Normally 'ClrSet'. Model Primitive Datatype = NormalizedString.
+        clrs:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/ClrDType'
+          description: "A set of Clrs\n"
+        signedClrs:
+          minItems: 0
+          type: array
+          items:
+            pattern: '^([A-Za-z0-9-_]{4,})\.([-A-Za-z0-9-_]{4,})\.([A-Za-z0-9-_]{4,})$'
+            type: string
+          description: "A set of Clrs in JWS Compact Serialization format. Model Primitive Datatype = String.\n"
+      additionalProperties: false
+      description: "A set of CLRs.\n"
+    CriteriaDType:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The URI of a webpage that describes the criteria for the Achievement in a human-readable format. Model Primitive Datatype = AnyURI.
+          format: uri
+        type:
+          type: string
+          description: The JSON-LD type of this object. Normally 'Criteria'. Model Primitive Datatype = NormalizedString.
+        narrative:
+          type: string
+          description: A narrative of what is needed to earn the achievement. Markdown allowed. Model Primitive Datatype = String.
+      description: "Descriptive metadata about the achievements necessary to be recognized with an Assertion of a particular AchievementType. This data is added to the AchievementType so that it may be rendered when that AchievementType is displayed, instead of simply a link to human-readable criteria external to the Achievement Assertion. Embedding criteria allows either enhancement of an external criteria page or increased portability and ease of use by allowing issuers to skip hosting the formerly-required external criteria page altogether.\n"
+    CryptographicKeyDType:
+      required:
+        - id
+        - owner
+        - publicKeyPem
+      type: object
+      properties:
+        id:
+          type: string
+          description: The URI of the CryptographicKey document. Used during signed verification. Model Primitive Datatype = NormalizedString.
+        type:
+          type: string
+          description: The JSON-LD type of this object. Normally 'CryptographicKey'. Model Primitive Datatype = NormalizedString.
+        owner:
+          type: string
+          description: The identifier for the Profile that owns this PUBLIC KEY and the PRIVATE KEY used to sign the assertion or endorsement. Model Primitive Datatype = NormalizedString.
+        publicKeyPem:
+          type: string
+          description: 'The PUBLIC KEY in PEM format corresponding to the PRIVATE KEY used by the owner to sign the assertion or endorsement. The PEM key encoding is a widely-used method to express public keys, compatible with almost every Secure Sockets Layer library implementation. Model Primitive Datatype = String.'
+      description: "Based on the Key class from the W3C Web Payments Community Group Security Vocabulary. A CryptographicKey document identifies and describes a public key used to verify signed Assertions.\n"
+    DiscoveryDocumentDType:
+      required:
+        - authorizationUrl
+        - name
+        - privacyPolicyUrl
+        - registrationUrl
+        - scopesOffered
+        - termsOfServiceUrl
+        - tokenUrl
+        - '@context'
+      type: object
+      properties:
+        '@context':
+          oneOf:
+            - type: string
+              description: The context URL
+              format: uri
+            - type: array
+              items:
+                type: string
+                format: uri
+              description: Array of context URLs
+          description: JSON-LD Context
+        authorizationUrl:
+          type: string
+          description: A fully qualifed URL to the provider's OAuth 2.0 Authorization endpoint. Model Primitive Datatype = AnyURI.
+          format: uri
+        image:
+          type: string
+          description: An image representing the provider. May be a Data URI or the URL where the image may be found. Model Primitive Datatype = NormalizedString.
+        name:
+          type: string
+          description: The user-facing name of the platform providing CLR services. Model Primitive Datatype = String.
+        privacyPolicyUrl:
+          type: string
+          description: A fully qualified URL to the provider's privacy policy. Model Primitive Datatype = AnyURI.
+          format: uri
+        registrationUrl:
+          type: string
+          description: A fully qualified URL to the provider's OAuth 2.0 Registration endpoint. Model Primitive Datatype = AnyURI.
+          format: uri
+        scopesOffered:
+          minItems: 1
+          type: array
+          items:
+            type: string
+            format: uri
+          description: An array of OAuth 2.0 Scopes supported by the provider. Model Primitive Datatype = AnyURI.
+        termsOfServiceUrl:
+          type: string
+          description: A fully qualified URL to the provider's terms of service. Model Primitive Datatype = AnyURI.
+          format: uri
+        tokenUrl:
+          type: string
+          description: A fully qualified URL to the provider's OAuth 2.0 Token endpoint. Model Primitive Datatype = AnyURI.
+          format: uri
+      additionalProperties: false
+      description: "Configuration information about the provider implementation.\n"
+    EndorsementDType:
+      required:
+        - id
+        - claim
+        - issuedOn
+        - issuer
+        - verification
+      type: object
+      properties:
+        id:
+          type: string
+          description: 'Globally unique IRI for the Endorsement. If this Endorsement will be verified using Hosted verification, the value should be the URL of the hosted version of the Endorsement. Model Primitive Datatype = NormalizedString.'
+        type:
+          type: string
+          description: The JSON-LD type of this entity. Normally 'Endorsement'. Model Primitive Datatype = NormalizedString.
+        claim:
+          $ref: '#/components/schemas/EndorsementClaimDType'
+        issuedOn:
+          type: string
+          description: Timestamp of when the endorsement was published. Model Primitive Datatype = DateTime.
+          format: date-time
+        issuer:
+          $ref: '#/components/schemas/EndorsementProfileDType'
+        revocationReason:
+          type: string
+          description: 'If revoked, optional reason for revocation. Model Primitive Datatype = String.'
+        revoked:
+          type: boolean
+          description: If True the endorsement is revoked. Model Primitive Datatype = Boolean.
+        verification:
+          $ref: '#/components/schemas/VerificationDType'
+      description: "An endorsement claim.\n"
+    EndorsementClaimDType:
+      required:
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: 'The ''id'' of the Profile, Achievement, Assertion, or CLR being endorsed. Model Primitive Datatype = NormalizedString.'
+        type:
+          type: string
+          description: The JSON-LD type of this entity. Normally 'EndorsementClaim'. Model Primitive Datatype = NormalizedString.
+        endorsementComment:
+          type: string
+          description: An endorser's comment about the quality or fitness of the endorsed entity. Markdown allowed. Model Primitive Datatype = String.
+      description: "An entity, identified by an id and additional properties that the endorser would like to claim about that entity.\n"
+    EndorsementProfileDType:
+      required:
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: Globally unique IRI for the Profile. Model Primitive Datatype = NormalizedString.
+        type:
+          type: string
+          description: 'The JSON-LD type of this entity. Normally ''Profile''. Unlike the Profile object, the EndorsementProfile object does not have an ''endorsements'' property. Model Primitive Datatype = NormalizedString.'
+        additionalName:
+          type: string
+          description: 'An additional name for a person, can be used for a middle name. Model Primitive Datatype = String.'
+        address:
+          $ref: '#/components/schemas/AddressDType'
+        description:
+          type: string
+          description: A short description of the individual or organization. Model Primitive Datatype = String.
+        email:
+          type: string
+          description: A contact email address for the individual or organization. Model Primitive Datatype = String.
+        familyName:
+          type: string
+          description: 'Family name of a person. In the U.S., the last name of a person. Model Primitive Datatype = String.'
+        givenName:
+          type: string
+          description: 'Given name of a person. In the U.S., the first name of a person. Model Primitive Datatype = String.'
+        identifiers:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/SystemIdentifierDType'
+          description: "A set of System Identifiers that represent other identifiers for this Profile.\n"
+        image:
+          type: string
+          description: Image representing the individual or organization. Model Primitive Datatype = NormalizedString.
+        name:
+          type: string
+          description: The full name of the individual or organization. Model Primitive Datatype = String.
+        official:
+          type: string
+          description: The name of the authorized official for the Issuer. Model Primitive Datatype = String.
+        publicKey:
+          $ref: '#/components/schemas/CryptographicKeyDType'
+        revocationList:
+          type: string
+          description: 'The URL of the Revocation List document used for marking revocation of signed Assertions, CLRs, and Endorsements. Required for issuer profiles. Model Primitive Datatype = AnyURI.'
+          format: uri
+        sourcedId:
+          type: string
+          description: 'The individual''s unique ''sourcedId'' value, which is used for providing interoperability with IMS Learning Information Services (LIS). Model Primitive Datatype = String.'
+        studentId:
+          type: string
+          description: An institution's student identifier for the person. This is frequently issued through a Student Information System. Model Primitive Datatype = String.
+        telephone:
+          type: string
+          description: Primary phone number for the individual or organization. Model Primitive Datatype = String.
+        url:
+          type: string
+          description: 'Web resource that uniquely represents or belongs to the individual. This may be a resource about the individual, hosting provided by the institution to the individual, or an web resource independently controlled by the individual. Model Primitive Datatype = AnyURI.'
+          format: uri
+        verification:
+          $ref: '#/components/schemas/VerificationDType'
+      description: "A Profile is a collection of information that describes the person or organization using Comprehensive Learner Record (CLR). Publishers, learners, and issuers must be represented as profiles. Recipients, endorsers, or other entities may also be represented using this vocabulary. An EndorsementProfile cannot have endorsements.\n"
+    EvidenceDType:
+      required:
+        - name
+      type: object
+      properties:
+        id:
+          type: string
+          description: The URI of a webpage presenting evidence of achievement. Model Primitive Datatype = AnyURI.
+          format: uri
+        type:
+          type: string
+          description: The JSON-LD type of this entity. Normally 'Evidence'. Model Primitive Datatype = NormalizedString.
+        artifacts:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/ArtifactDType'
+          description: "Artifacts that are part of the evidence.\n"
+        audience:
+          type: string
+          description: A description of the intended audience for a piece of evidence. Model Primitive Datatype = String.
+        description:
+          type: string
+          description: A longer description of the evidence. Model Primitive Datatype = String.
+        genre:
+          type: string
+          description: 'A string that describes the type of evidence. For example, Poetry, Prose, Film. Model Primitive Datatype = String.'
+        name:
+          type: string
+          description: The name of the evidence. Model Primitive Datatype = String.
+        narrative:
+          type: string
+          description: A narrative that describes the evidence and process of achievement that led to an assertion. Markdown allowed. Model Primitive Datatype = String.
+      description: "One or more artifacts that represent supporting evidence for the record. Examples include text, media, websites, etc.\n"
+    GetAssertionPayloadDType:
+      required:
+        - id
+        - '@context'
+      type: object
+      properties:
+        '@context':
+          oneOf:
+            - type: string
+              description: The context URL
+              format: uri
+            - type: array
+              items:
+                type: string
+                format: uri
+              description: Array of context URLs
+          description: JSON-LD Context
+        id:
+          type: string
+          description: 'Globally unique IRI for the Assertion. If the IRI is a URL it must resolve to an Assertion resource. If the Assertion is verified using Hosted verification, the IRI must be a URL. Model Primitive Datatype = NormalizedString.'
+        type:
+          type: string
+          description: The JSON-LD type of this object. Normally 'Assertion'. Model Primitive Datatype = NormalizedString.
+        achievement:
+          $ref: '#/components/schemas/AchievementDType'
+        activityEndDate:
+          type: string
+          description: 'If present, end date for the activity. Model Primitive Datatype = DateTime.'
+          format: date-time
+        activityStartDate:
+          type: string
+          description: 'If present, start date for the activity. Model Primitive Datatype = DateTime.'
+          format: date-time
+        creditsEarned:
+          type: number
+          description: 'The number of credits earned, generally in semester or quarter credit hours.  This field correlates with the Achievement creditsAvailable field. Model Primitive Datatype = Float.'
+          format: float
+        endorsements:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/EndorsementDType'
+          description: "Allows endorsers to make specific claims about the assertion.\n"
+        evidence:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceDType'
+          description: "Evidence describing the work that the recipient did to earn the achievement. This can be a webpage that links out to other pages if linking directly to the work is infeasible.\n"
+        expires:
+          type: string
+          description: 'If the achievement has some notion of expiry, this indicates a timestamp when an assertion should no longer be considered valid. After this time, the assertion should be considered expired. Model Primitive Datatype = DateTime.'
+          format: date-time
+        image:
+          type: string
+          description: IRI of an image representing the assertion. May be a Data URI or the URL where the image may be found. Model Primitive Datatype = NormalizedString.
+        issuedOn:
+          type: string
+          description: Timestamp of when the achievement was awarded. Required unless the assertion is revoked. Model Primitive Datatype = DateTime.
+          format: date-time
+        licenseNumber:
+          type: string
+          description: The license number that was issued with this assertion. Model Primitive Datatype = String.
+        narrative:
+          type: string
+          description: A narrative that describes the connection between multiple pieces of evidence. Likely only present if evidence is a multi-value array. Markdown allowed. Model Primitive Datatype = String.
+        recipient:
+          $ref: '#/components/schemas/IdentityDType'
+        results:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/ResultDType'
+          description: "The set of results being asserted.\n"
+        revocationReason:
+          type: string
+          description: 'Optional published reason for revocation, if revoked. Model Primitive Datatype = String.'
+        revoked:
+          type: boolean
+          description: 'Defaults to false if this assertion is not referenced in a RevocationList. If revoked is true, only revoked and id are required properties, and many issuers strip a hosted assertion down to only those properties when revoked. Model Primitive Datatype = Boolean.'
+        role:
+          type: string
+          description: 'Role, position, or title of the learner when demonstrating or performing the achievement or evidence of learning being asserted. Examples include ''Student President'', ''Intern'', ''Captain'', etc. Model Primitive Datatype = String.'
+        signedEndorsements:
+          minItems: 0
+          type: array
+          items:
+            pattern: '^([A-Za-z0-9-_]{4,})\.([-A-Za-z0-9-_]{4,})\.([A-Za-z0-9-_]{4,})$'
+            type: string
+          description: "Signed endorsements in JWS Compact Serialization format. Model Primitive Datatype = String.\n"
+        source:
+          $ref: '#/components/schemas/ProfileDType'
+        term:
+          type: string
+          description: The academic term in which this assertion was achieved. Model Primitive Datatype = String.
+        verification:
+          $ref: '#/components/schemas/VerificationDType'
+      additionalProperties: false
+      description: "Payload for the 'getAssertion' operation.\n"
+    GetClrPayloadDType:
+      required:
+        - id
+        - issuedOn
+        - learner
+        - publisher
+        - '@context'
+      type: object
+      properties:
+        '@context':
+          oneOf:
+            - type: string
+              description: The context URL
+              format: uri
+            - type: array
+              items:
+                type: string
+                format: uri
+              description: Array of context URLs
+          description: JSON-LD Context
+        id:
+          type: string
+          description: 'Globally unique IRI for the CLR. If the IRI is a URL is must resolve to a CLR resource and conform to the getClr endpoint format. If the CLR is verified using Hosted verification, the IRI must be a URL. Model Primitive Datatype = NormalizedString.'
+        type:
+          type: string
+          description: The JSON-LD type of this object. Normally 'Clr'. Model Primitive Datatype = NormalizedString.
+        achievements:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/AchievementDType'
+          description: "Array of achievements that are related directly or indirectly through associations with the asserted achievements in the CLR. Primarily used to represent hierarchical pathways. Asserted achievements may appear in both this array and in the achievement assertion. If asserted achievements do appear in both places, they MUST match exactly.\n"
+        assertions:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/AssertionDType'
+          description: "The learner's asserted achievements.\n"
+        endorsements:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/EndorsementDType'
+          description: "Allows endorsers to make specific claims about the CLR, or any assertion, achievement, or profile referenced in the CLR.\n"
+        issuedOn:
+          type: string
+          description: Timestamp of when the CLR was published. Model Primitive Datatype = DateTime.
+          format: date-time
+        learner:
+          $ref: '#/components/schemas/ProfileDType'
+        name:
+          type: string
+          description: Optional name of the CLR. Model Primitive Datatype = String.
+        partial:
+          type: boolean
+          description: 'True if CLR does not contain all the assertions known by the publisher for the learner at the time the CLR is issued. Useful if you are sending a small set of achievements in real time when they are achieved. If False or omitted, the CLR SHOULD be interpreted as containing all the assertions for the learner known by the publisher at the time of issue. Model Primitive Datatype = Boolean.'
+        publisher:
+          $ref: '#/components/schemas/ProfileDType'
+        revocationReason:
+          type: string
+          description: 'If revoked, optional reason for revocation. Model Primitive Datatype = String.'
+        revoked:
+          type: boolean
+          description: If True the CLR is revoked. Model Primitive Datatype = Boolean.
+        signedAssertions:
+          minItems: 0
+          type: array
+          items:
+            pattern: '^([A-Za-z0-9-_]{4,})\.([-A-Za-z0-9-_]{4,})\.([A-Za-z0-9-_]{4,})$'
+            type: string
+          description: "Signed assertions in JWS Compact Serialization format. Model Primitive Datatype = String.\n"
+        signedEndorsements:
+          minItems: 0
+          type: array
+          items:
+            pattern: '^([A-Za-z0-9-_]{4,})\.([-A-Za-z0-9-_]{4,})\.([A-Za-z0-9-_]{4,})$'
+            type: string
+          description: "Signed endorsements of the CLR or any Achievement, Assertion, or Profile in the CLR; in JWS Compact Serialization format. Model Primitive Datatype = String.\n"
+        verification:
+          $ref: '#/components/schemas/VerificationDType'
+      additionalProperties: false
+      description: "Payload for the 'getClr' operation.\n"
+    GetCryptographicKeyPayloadDType:
+      required:
+        - id
+        - owner
+        - publicKeyPem
+        - '@context'
+      type: object
+      properties:
+        '@context':
+          oneOf:
+            - type: string
+              description: The context URL
+              format: uri
+            - type: array
+              items:
+                type: string
+                format: uri
+              description: Array of context URLs
+          description: JSON-LD Context
+        id:
+          type: string
+          description: The URI of the CryptographicKey document. Used during signed verification. Model Primitive Datatype = NormalizedString.
+        type:
+          type: string
+          description: The JSON-LD type of this object. Normally 'CryptographicKey'. Model Primitive Datatype = NormalizedString.
+        owner:
+          type: string
+          description: The identifier for the Profile that owns this PUBLIC KEY and the PRIVATE KEY used to sign the assertion or endorsement. Model Primitive Datatype = NormalizedString.
+        publicKeyPem:
+          type: string
+          description: 'The PUBLIC KEY in PEM format corresponding to the PRIVATE KEY used by the owner to sign the assertion or endorsement. The PEM key encoding is a widely-used method to express public keys, compatible with almost every Secure Sockets Layer library implementation. Model Primitive Datatype = String.'
+      additionalProperties: false
+      description: "Payload for the 'getKey' operation.\n"
+    GetEndorsementPayloadDType:
+      required:
+        - id
+        - claim
+        - issuedOn
+        - issuer
+        - verification
+        - '@context'
+      type: object
+      properties:
+        '@context':
+          oneOf:
+            - type: string
+              description: The context URL
+              format: uri
+            - type: array
+              items:
+                type: string
+                format: uri
+              description: Array of context URLs
+          description: JSON-LD Context
+        id:
+          type: string
+          description: 'Globally unique IRI for the Endorsement. If this Endorsement will be verified using Hosted verification, the value should be the URL of the hosted version of the Endorsement. Model Primitive Datatype = NormalizedString.'
+        type:
+          type: string
+          description: The JSON-LD type of this entity. Normally 'Endorsement'. Model Primitive Datatype = NormalizedString.
+        claim:
+          $ref: '#/components/schemas/EndorsementClaimDType'
+        issuedOn:
+          type: string
+          description: Timestamp of when the endorsement was published. Model Primitive Datatype = DateTime.
+          format: date-time
+        issuer:
+          $ref: '#/components/schemas/EndorsementProfileDType'
+        revocationReason:
+          type: string
+          description: 'If revoked, optional reason for revocation. Model Primitive Datatype = String.'
+        revoked:
+          type: boolean
+          description: If True the endorsement is revoked. Model Primitive Datatype = Boolean.
+        verification:
+          $ref: '#/components/schemas/VerificationDType'
+      additionalProperties: false
+      description: "Payload for the 'getEndorsement' operation.\n"
+    GetRevocationListPayloadDType:
+      required:
+        - id
+        - issuer
+        - '@context'
+      type: object
+      properties:
+        '@context':
+          oneOf:
+            - type: string
+              description: The context URL
+              format: uri
+            - type: array
+              items:
+                type: string
+                format: uri
+              description: Array of context URLs
+          description: JSON-LD Context
+        id:
+          type: string
+          description: The URI of the RevocationList document. Used during Signed verification. Model Primitive Datatype = AnyURI.
+          format: uri
+        type:
+          type: string
+          description: The JSON-LD type of this entity. Normally 'RevocationList'. Model Primitive Datatype = NormalizedString.
+        issuer:
+          type: string
+          description: The id of the Issuer. Model Primitive Datatype = NormalizedString.
+        revokedAssertions:
+          minItems: 0
+          type: array
+          items:
+            type: string
+          description: "The ids of revoked Assertions, Clrs, and Endorsements. Model Primitive Datatype = NormalizedString.\n"
+      additionalProperties: false
+      description: "Payload for the 'getRevocationList' operation.\n"
+    IdentityDType:
+      required:
+        - type
+        - identity
+        - hashed
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique IRI for the Identity. Model Primitive Datatype = NormalizedString.
+        type:
+          type: string
+          description: 'The type should identify the property by which the recipient of an Assertion is identified. This value should be an IRI mapped in the present context. For example, ''id'' indicates that the identity property value is the id of the recipient''s profile. Model Primitive Datatype = NormalizedString.'
+        identity:
+          type: string
+          description: 'Either the hash of the identity or the plaintext value. If it''s possible that the plaintext transmission and storage of the identity value would leak personally identifiable information where there is an expectation of privacy, it is strongly recommended that an IdentityHash be used. Model Primitive Datatype = String.'
+        hashed:
+          type: boolean
+          description: Whether or not the identity value is hashed. Model Primitive Datatype = Boolean.
+        salt:
+          type: string
+          description: 'If the recipient is hashed, this should contain the string used to salt the hash. If this value is not provided, it should be assumed that the hash was not salted. Model Primitive Datatype = String.'
+      description: "A collection of information about the recipient of an achievement assertion.\n"
+    PostClrPayloadDType:
+      required:
+        - '@context'
+      type: object
+      properties:
+        '@context':
+          oneOf:
+            - type: string
+              description: The context URL
+              format: uri
+            - type: array
+              items:
+                type: string
+                format: uri
+              description: Array of context URLs
+          description: JSON-LD Context
+        clr:
+          $ref: '#/components/schemas/ClrDType'
+        signedClr:
+          pattern: '^([A-Za-z0-9-_]{4,})\.([-A-Za-z0-9-_]{4,})\.([A-Za-z0-9-_]{4,})$'
+          type: string
+          description: The signed Clr in JWS Compact Serialization format. Model Primitive Datatype = String.
+      additionalProperties: false
+      description: "Payload for the 'postClr' operation. Only one format (signed or unsigned) is allowed.\n"
+    ProfileDType:
+      required:
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: 'Globally unique IRI for the Learner, Publisher, and Issuer Profile. If the IRI is a URL it must resolve to a Profile resource. The Assertion Recipient is identified by reference to the Learner''s Profile via the id, email, url, telephone, sourcedId, or studentId property. Model Primitive Datatype = NormalizedString.'
+        type:
+          type: string
+          description: The JSON-LD type of this object. Normally 'Profile'. Model Primitive Datatype = NormalizedString.
+        address:
+          $ref: '#/components/schemas/AddressDType'
+        additionalName:
+          type: string
+          description: 'An additional name for a person, can be used for a middle name. Model Primitive Datatype = String.'
+        birthDate:
+          type: string
+          description: Birthdate of the person. Model Primitive Datatype = Date.
+          format: date
+        description:
+          type: string
+          description: A short description of the individual or organization. Model Primitive Datatype = String.
+        email:
+          type: string
+          description: A contact email address for the individual or organization. Model Primitive Datatype = String.
+        endorsements:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/EndorsementDType'
+          description: "Allows endorsers to make specific claims about the individual or organization represented by this profile.\n"
+        familyName:
+          type: string
+          description: 'Family name of a person. In the U.S., the last name of a person. Model Primitive Datatype = String.'
+        givenName:
+          type: string
+          description: 'Given name of a person. In the U.S., the first name of a person. Model Primitive Datatype = String.'
+        identifiers:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/SystemIdentifierDType'
+          description: "A set of System Identifiers that represent other identifiers for this Profile.\n"
+        image:
+          type: string
+          description: IRI of an image representing the individual or organization. May be a DATA URI or the URL where the image may be found. Model Primitive Datatype = NormalizedString.
+        name:
+          type: string
+          description: The full name of the individual or organization. Model Primitive Datatype = String.
+        official:
+          type: string
+          description: The name of the authorized official for the Issuer. Model Primitive Datatype = String.
+        parentOrg:
+          $ref: '#/components/schemas/ProfileDType'
+        publicKey:
+          $ref: '#/components/schemas/CryptographicKeyDType'
+        revocationList:
+          type: string
+          description: 'The URL of the Revocation List document used for marking revocation of signed Assertions, CLRs, and Endorsements. Required for issuer profiles. Model Primitive Datatype = AnyURI.'
+          format: uri
+        signedEndorsements:
+          minItems: 0
+          type: array
+          items:
+            pattern: '^([A-Za-z0-9-_]{4,})\.([-A-Za-z0-9-_]{4,})\.([A-Za-z0-9-_]{4,})$'
+            type: string
+          description: "Signed endorsements in JWS Compact Serialization format. Model Primitive Datatype = String.\n"
+        sourcedId:
+          type: string
+          description: 'The individual''s or organization''s unique ''sourcedId'' value, which is used for providing interoperability with other identity systems. Model Primitive Datatype = String.'
+        studentId:
+          type: string
+          description: An institution's student identifier for the person. This is frequently issued through a Student Information System. Model Primitive Datatype = String.
+        telephone:
+          type: string
+          description: Primary phone number for the individual or organization. Model Primitive Datatype = String.
+        url:
+          type: string
+          description: 'Web resource that uniquely represents or belongs to the individual. This may be a resource about the individual, hosting provided by the institution to the individual, or an web resource independently controlled by the individual. Model Primitive Datatype = AnyURI.'
+          format: uri
+        verification:
+          $ref: '#/components/schemas/VerificationDType'
+      description: "A Profile is a collection of information that describes the person or organization using Comprehensive Learner Record (CLR). Publishers, learners, and issuers must be represented as profiles. Recipients, endorsers, or other entities may also be represented using this vocabulary.\n"
+    ResultDType:
+      required:
+        - resultDescription
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique IRI for the object. Model Primitive Datatype = NormalizedString.
+        type:
+          type: string
+          description: The JSON-LD type of this object. Normally 'Result'. Model Primitive Datatype = NormalizedString.
+        achievedLevel:
+          type: string
+          description: The id of the RubricCriterionLevel achieved. Model Primitive Datatype = NormalizedString.
+        alignments:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/AlignmentDType'
+          description: "The alignments between this result and nodes in external frameworks. This set of alignments are in addition to the set of alignments defined in the corresponding ResultDescription object.\n"
+        resultDescription:
+          type: string
+          description: The id of the ResultDescription describing this result. Model Primitive Datatype = NormalizedString.
+        status:
+          enum:
+            - Completed
+            - Enrolled
+            - Failed
+            - InProgress
+            - OnHold
+            - Withdrew
+          type: string
+          description: "The status of the achievement. Required if 'ResultType' is 'Status'.\n"
+        value:
+          type: string
+          description: 'A grade or value representing the result of the performance, or demonstration, of the achievement.  For example, ''A'' if the recipient received a grade of A in the class.  Model Primitive Datatype = String.'
+      description: "Describes a result of an achievement.\n"
+    ResultDescriptionDType:
+      required:
+        - id
+        - name
+        - resultType
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique IRI for the ResultDescription. Model Primitive Datatype = NormalizedString.
+        type:
+          type: string
+          description: The JSON-LD type of this object. Normally 'ResultDescription'. Model Primitive Datatype = NormalizedString.
+        alignments:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/AlignmentDType'
+          description: "The alignments between this result description and nodes in external frameworks.\n"
+        allowedValues:
+          minItems: 0
+          type: array
+          items:
+            type: string
+          description: The ordered from 'low' to 'high' set of allowed values. Model Primitive Datatype = String.
+        name:
+          type: string
+          description: The name of the result. Model Primitive Datatype = String.
+        requiredLevel:
+          type: string
+          description: The id of the RubricCriterionLevel required to 'pass'. Model Primitive Datatype = NormalizedString.
+        requiredValue:
+          type: string
+          description: The value from allowedValues or within the range of valueMin to valueMax required to 'pass'. Model Primitive Datatype = String.
+        resultType:
+          anyOf:
+            - pattern: '(ext:)[a-zA-Z0-9\.\-_]+'
+              type: string
+              description: The data-type that enables an enumerated vocabulary to be extended. Model Primitive Datatype = String.
+            - enum:
+                - GradePointAverage
+                - LetterGrade
+                - Percent
+                - PerformanceLevel
+                - PredictedScore
+                - Result
+                - RawScore
+                - RubricCriterion
+                - RubricCriterionLevel
+                - RubricScore
+                - ScaledScore
+                - Status
+              type: string
+          description: "The type of result. This is an extensible enumerated vocabulary.\n"
+        rubricCriterionLevels:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/RubricCriterionLevelDType'
+          description: "The ordered from 'low' to 'high' set of rubric criterion levels that may be asserted.\n"
+        valueMax:
+          type: string
+          description: The maximum possible result that may be asserted. Model Primitive Datatype = String.
+        valueMin:
+          type: string
+          description: The minimum possible result that may be asserted. Model Primitive Datatype = String.
+      description: "Describes a possible achievement result.\n"
+    RubricCriterionLevelDType:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique IRI for the ResultCriterionLevel. Model Primitive Datatype = NormalizedString.
+        type:
+          type: string
+          description: The JSON-LD type of this object. Normally 'RubricCriterionLevel'. Model Primitive Datatype = String.
+        alignments:
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/AlignmentDType'
+          description: "The alignments between this rubric criterion level and nodes in external frameworks.\n"
+        description:
+          type: string
+          description: A description of the rubric criterion level. Model Primitive Datatype = String.
+        level:
+          type: string
+          description: The rubric performance level in terms of success. Model Primitive Datatype = String.
+        name:
+          type: string
+          description: The name of the RubricCriterionLevel. Model Primitive Datatype = String.
+        points:
+          type: string
+          description: The number of grade points corresponding to a specific rubric level. Model Primitive Datatype = String.
+      description: "Describes a rubric criterion level.\n"
+    SystemIdentifierDType:
+      required:
+        - identifier
+        - identifierType
+      type: object
+      properties:
+        type:
+          type: string
+          description: The JSON-LD type of this object. Normally 'SystemIdentifier'. Model Primitive Datatype = NormalizedString.
+        identifier:
+          type: string
+          description: Opaque string representing the system identifier value. Model Primitive Datatype = String.
+        identifierType:
+          anyOf:
+            - enum:
+                - LisSourcedId
+                - OneRosterSourcedId
+              type: string
+            - pattern: '(ext:)[a-zA-Z0-9\.\-_]+'
+              type: string
+              description: The data-type that enables an enumerated vocabulary to be extended. Model Primitive Datatype = String.
+          description: "The identifier type. This is an extensible enumerated vocabulary. Extending the vocabulary makes use of a naming convention. For example, the NCES School ID might be 'ext:NcesSchoolId'. Extended vocabulary terms must start with 'ext:' followed by any valid JSON string value. Please see the latest version of the CLR Implementation Guide for suggested values.\n"
+      description: "A SystemIdentifier represents a single, system-local identifier for an Achievement.\n"
+    VerificationDType:
+      required:
+        - type
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique IRI for the Verification. Model Primitive Datatype = NormalizedString.
+        type:
+          enum:
+            - Hosted
+            - Signed
+            - Verification
+          type: string
+          description: "The JSON-LD type of this object. The strongly typed value indicates the verification method.\n"
+        allowedOrigins:
+          minItems: 0
+          type: array
+          items:
+            type: string
+          description: The host registered name subcomponent of an allowed origin. Any given id URI will be considered valid. Model Primitive Datatype = String.
+        creator:
+          type: string
+          description: 'The (HTTP) id of the key used to sign the Assertion, CLR, or Endorsement. If not present, verifiers will check the public key declared in the referenced issuer Profile. If a key is declared here, it must be authorized in the issuer Profile as well. creator is expected to be the dereferencable URI of a document that describes a CryptographicKey. Model Primitive Datatype = AnyURI.'
+          format: uri
+        startsWith:
+          minItems: 0
+          type: array
+          items:
+            type: string
+          description: 'The URI fragment that the verification property must start with. Valid Assertions, Clrs, and Endorsements must have an id within this scope. Multiple values allowed, and Assertions, Clrs, and Endorsements will be considered valid if their id starts with one of these values. Model Primitive Datatype = String.'
+        verificationProperty:
+          type: string
+          description: 'The property to be used for verification. Only ''id'' is supported. Verifiers will consider ''id'' the default value if verificationProperty is omitted or if an issuer Profile has no explicit verification instructions, so it may be safely omitted. Model Primitive Datatype = String.'
+      description: "Information a reviewer can use to verify an Assertion, Clr, or Endorsement.\n"
+    imsx_CodeMinorDType:
+      required:
+        - imsx_codeMinorField
+      type: object
+      properties:
+        imsx_codeMinorField:
+          minItems: 1
+          type: array
+          items:
+            $ref: '#/components/schemas/imsx_CodeMinorFieldDType'
+          description: "Each reported code minor status code.\n"
+      additionalProperties: false
+      description: "This is the container for the set of code minor status codes reported in the responses from the Service Provider.\n"
+    imsx_CodeMinorFieldDType:
+      required:
+        - imsx_codeMinorFieldName
+        - imsx_codeMinorFieldValue
+      type: object
+      properties:
+        imsx_codeMinorFieldName:
+          type: string
+          description: This should contain the identity of the system that has produced the code minor status code report. Model Primitive Datatype = NormalizedString.
+        imsx_codeMinorFieldValue:
+          enum:
+            - forbidden
+            - fullsuccess
+            - internal_server_error
+            - invalid_data
+            - invalid_query_parameter
+            - misdirected_request
+            - not_acceptable
+            - not_allowed
+            - not_modified
+            - server_busy
+            - unauthorizedrequest
+            - unknown
+          type: string
+          description: "The code minor status code (this is a value from the corresponding enumerated vocabulary).\n"
+      additionalProperties: false
+      description: "This is the container for a single code minor status code.\n"
+    imsx_StatusInfoDType:
+      required:
+        - imsx_codeMajor
+        - imsx_severity
+        - '@context'
+      type: object
+      properties:
+        '@context':
+          oneOf:
+            - type: string
+              description: The context URL
+              format: uri
+            - type: array
+              items:
+                type: string
+                format: uri
+              description: Array of context URLs
+          description: JSON-LD Context
+        imsx_codeMajor:
+          enum:
+            - success
+            - failure
+            - processing
+            - unsupported
+          type: string
+          description: "The code major value (from the corresponding enumerated vocabulary).\n"
+        imsx_severity:
+          enum:
+            - status
+            - warning
+            - error
+          type: string
+          description: "The severity value (from the corresponding enumerated vocabulary).\n"
+        imsx_description:
+          type: string
+          description: A human readable description supplied by the entity creating the status code information. Model Primitive Datatype = String.
+        imsx_codeMinor:
+          $ref: '#/components/schemas/imsx_CodeMinorDType'
+      additionalProperties: false
+      description: "This is the container for the status code and associated information returned within the HTTP messages received from the Service Provider.\n"
+  securitySchemes:
+    OAuth2CCG:
+      type: oauth2
+      description: "OAuth 2.0 Client Credentials authorization per IMS Security Framework.\n"
+      flows:
+        clientCredentials:
+          tokenUrl: https://provider/token
+          scopes:
+            https://purl.imsglobal.org/spec/clr/v1p0/scope/delete: Grants the app permission to delete your comprehensive learner records on this host.
+            https://purl.imsglobal.org/spec/clr/v1p0/scope/readonly: Grants the app permission to read your comprehensive learner records on this host.
+            https://purl.imsglobal.org/spec/clr/v1p0/scope/replace: Grants the app permission to create or replace your comprehensive learner records on this host.
+    OAuth2ACG:
+      type: oauth2
+      description: "OAuth 2.0 Authorization Code Grant authorization per IMS Security Framework.\n"
+      flows:
+        authorizationCode:
+          authorizationUrl: https://provider/authorize
+          tokenUrl: https://provider/token
+          refreshUrl: https://provider/token
+          scopes:
+            https://purl.imsglobal.org/spec/clr/v1p0/scope/delete: Grants the app permission to delete your comprehensive learner records on this host.
+            https://purl.imsglobal.org/spec/clr/v1p0/scope/readonly: Grants the app permission to read your comprehensive learner records on this host.
+            https://purl.imsglobal.org/spec/clr/v1p0/scope/replace: Grants the app permission to create or replace your comprehensive learner records on this host.
+tags:
+  - name: AssertionsManager
+    description: "The set of service operations that manage access to Assertions for Hosted Verification.\n"
+  - name: ClrsManager
+    description: "The set of service operations that manage access to CLRs.\n"
+  - name: DiscoveryManager
+    description: "The set of service operations that manage access to the DiscoveryDocument for dynamic consumer registration.\n"
+  - name: EndorsementsManager
+    description: "The set of service operations that manage access to Endorsements for Hosted Verification.\n"
+  - name: KeysManager
+    description: "The set of service operations that manage access to CryptographicKeys for Signed Verification.\n"
+  - name: RevocationsManager
+    description: "The set of service operations that manage access to RevocationLists for Signed Verification.\n"
