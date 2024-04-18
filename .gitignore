@@ -40,3 +40,5 @@ db-data/
 db-logs/
 
 mysql-schema/
+
+.env
