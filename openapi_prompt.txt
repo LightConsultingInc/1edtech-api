@@ -1,0 +1,1 @@
+openapi-generator-cli generate -g mysql-schema -i ./specs/lti.yaml -o ./mysql-schema/ --openapi-normalizer REFACTOR_ALLOF_WITH_PROPERTIES_ONLY=true --additional-properties=jsonDataTypeEnabled=false

@@ -1,0 +1,860 @@
+openapi: 3.0.1
+info:
+  title: LTI Resource Search Service OpenAPI (JSON) Definition
+  description: 'The IMS LTI Resource Search (RS) Service defines how to search digital
+    respositories for a set of resources. '
+  contact:
+    name: "Lisa Mattson (COO), IMS Global "
+    url: http://www.imsglobal.org
+    email: lmattson@imsglobal.org
+  license:
+    name: IMS Global
+    url: https://www.imsglobal.org/license.html
+  version: "1.0"
+servers:
+- url: http://www.imsglobal.org/ims/rs/v1p0
+- url: https://www.imsglobal.org/ims/rs/v1p0
+tags:
+- name: ResourceSearchManager
+  description: The set of service operations that manage searching for resources.
+- name: SubjectsManager
+  description: The set of service operations that manage access to the lists of subjects
+    supported by a LOR.
+paths:
+  /resources:
+    get:
+      tags:
+      - ResourceSearchManager
+      summary: The REST read request message for the searchForResources() API call.
+      description: This is the search request. The criteria for the search are passed
+        as query parameters and the set of identified resources are returned in the
+        payload for the response message.
+      operationId: searchForResources
+      parameters:
+      - name: limit
+        in: query
+        description: This is used as part of the data pagination mechanism to control
+          the number of records returned in any one response message. The 'limit'
+          defines the download segmentation value i.e. the maximum number of records
+          to be contained in the response. The form of implementation is described
+          in the corresponding binding document(s).
+        allowEmptyValue: false
+        schema:
+          minimum: 1
+          type: integer
+          format: int32
+          default: 100
+      - name: offset
+        in: query
+        description: This is used as part of the data pagination mechanism to control
+          the download rate of data. The 'offset' is the number of the first record
+          to be supplied in the segmented response message. The form of implementation
+          is described in the corresponding binding document(s).
+        allowEmptyValue: false
+        schema:
+          minimum: 0
+          type: integer
+          format: int32
+          default: 0
+      - name: filter
+        in: query
+        description: "The filtering rules to be applied when identifying the records\
+          \ to be supplied in the response message. Filtering defines the search criteria\
+          \ to be applied at the service provider for the identification and selection\
+          \ of the resources to be returned. A strict vocabulary is used for the permitted\
+          \ search terms (see the RS REST/JSON binding document 'Keyword Searching'\
+          \ in Sub-section 3.1 [RS-RJ, 18])."
+        allowEmptyValue: false
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: This is used as part of the sorting mechanism to be use by the
+          service provider. The 'sort' identifies the sort criteria to be used for
+          the records in the response message. Use with the orderBy parameter. The
+          form of implementation is described in the corresponding binding document(s).
+        allowEmptyValue: false
+        schema:
+          type: string
+      - name: orderBy
+        in: query
+        description: This is used as part of the sorting mechanism to be use by the
+          service provider. This defines the form of ordering for response to the
+          sorted request i.e. ascending (asc) or descending (desc). The form of implementation
+          is described in the corresponding binding document(s).
+        allowEmptyValue: false
+        schema:
+          type: string
+          enum:
+          - asc
+          - desc
+      - name: fields
+        in: query
+        description: "To identify the range of fields, and only those fields, that\
+          \ should be supplied in the response message. The permitted vocabulary for\
+          \ these fields is determined by the payloads that are returned in the corresponding\
+          \ response messages."
+        allowEmptyValue: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: The response code for when the query request has been successfully
+            completed and the set of identified resources returned. This would be
+            accompanied by the 'codeMajor/severity' values of 'success/status'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceSet.Type'
+        "400":
+          description: The request has been declared as 'bad'.  This will be due to
+            the provision of bad data in the request query parameters. This is accompanied
+            by the 'codeMajor/severity' values of 'failure/error'.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfo.Type'
+        "401":
+          description: 'The request was not correctly authorised i.e. ''unauthorisedrequest''.
+            This would be accompanied by the ''codeMajor/severity'' values of ''failure/error''. '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfo.Type'
+        "403":
+          description: This is used to indicate that the server can be reached and
+            process the request but refuses to take any further action. This would
+            be accompanied by the 'codeMajor/severity' values of 'failure/error'.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfo.Type'
+        "500":
+          description: 'This code should be used only if there is catastrophic error
+            and there is not a more appropriate code i.e. ''internal_server_error''.
+            This would be accompanied by the ''codeMajor/severity'' values of ''failure/error''. '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfo.Type'
+        default:
+          description: This is the response data payload to be supplied when the HTTP
+            code is NOT explicitly defined. This would be accompanied by the 'codeMajor/severity'
+            values of 'failure/error' and the appropriate 'codeMinor' value. The associated
+            HTTP code will also be supplied.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfo.Type'
+        "422":
+          description: "This error condition may occur if a JSON request body contains\
+            \ well-formed i.e. syntactically correct, but semantically erroneous,\
+            \ JSON instructions. This would be accompanied by the 'codeMajor/severity'\
+            \ values of 'failure/error'. "
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfo.Type'
+        "429":
+          description: The server is receiving too many requests i.e. 'server_busy'.
+            Retry at a later time. This would be accompanied by the 'codeMajor/severity'
+            values of 'failure/error'.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfo.Type'
+  /subjects:
+    get:
+      tags:
+      - SubjectsManager
+      summary: The REST read request message for the getAllSubjects() API call.
+      description: "To obtain, read, the list of subjects that are supported by a\
+        \ LOR."
+      operationId: getAllSubjects
+      responses:
+        "200":
+          description: The response code for when the query request has been successfully
+            completed and the set of subjects returned. This would be accompanied
+            by the 'codeMajor/severity' values of 'success/status'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubjectSet.Type'
+        "400":
+          description: The request has been declared as 'bad'.  This will be due to
+            the provision of bad data in the request query parameters. This is accompanied
+            by the 'codeMajor/severity' values of 'failure/error'.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfo.Type'
+        "401":
+          description: 'The request was not correctly authorised i.e. ''unauthorisedrequest''.
+            This would be accompanied by the ''codeMajor/severity'' values of ''failure/error''. '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfo.Type'
+        "403":
+          description: This is used to indicate that the server can be reached and
+            process the request but refuses to take any further action. This would
+            be accompanied by the 'codeMajor/severity' values of 'failure/error'.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfo.Type'
+        "422":
+          description: "This error condition may occur if a JSON request body contains\
+            \ well-formed i.e. syntactically correct, but semantically erroneous,\
+            \ JSON instructions. This would be accompanied by the 'codeMajor/severity'\
+            \ values of 'failure/error'. "
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfo.Type'
+        "429":
+          description: The server is receiving too many requests i.e. 'server_busy'.
+            Retry at a later time. This would be accompanied by the 'codeMajor/severity'
+            values of 'failure/error'.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfo.Type'
+        "500":
+          description: 'This code should be used only if there is catastrophic error
+            and there is not a more appropriate code i.e. ''internal_server_error''.
+            This would be accompanied by the ''codeMajor/severity'' values of ''failure/error''. '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfo.Type'
+        default:
+          description: This is the response data payload to be supplied when the HTTP
+            code is NOT explicitly defined. This would be accompanied by the 'codeMajor/severity'
+            values of 'failure/error' and the appropriate 'codeMinor' value. The associated
+            HTTP code will also be supplied.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/imsx_StatusInfo.Type'
+components:
+  schemas:
+    CCLTILink.Type:
+      description: The extended set of information used to define the presence of
+        an LTI Link resource (this is based upon the definition for including an LTI
+        link inside an IMS Common Cartridge or IMS Thin Common Cartridge).
+      allOf:
+      - $ref: '#/components/schemas/LTILink.Type'
+      - type: object
+        properties:
+          cartridge_bundle:
+            $ref: '#/components/schemas/LTILinkResourceRef.Type'
+          cartridge_icon:
+            $ref: '#/components/schemas/LTILinkResourceRef.Type'
+          metadata:
+            $ref: '#/components/schemas/Metadata.Type'
+        additionalProperties: false
+    CSMSet.Type:
+      required:
+      - curriculumStandardsMetadata
+      type: object
+      properties:
+        resourceLabel:
+          type: string
+          description: "Model Primitive Datatype = NormalizedString. This is a human\
+            \ readable label used to identify the type of resource, or part of resource,\
+            \ to which the enclosed metadata refers."
+        resourcePartId:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. This is used to
+            contain the appropriate identifier that is used to identify the resource
+            part.
+        curriculumStandardsMetadata:
+          minItems: 1
+          type: array
+          description: The curriculum standards associated from a single source of
+            the curriculum standards definition.
+          items:
+            $ref: '#/components/schemas/CurriculumStandardsMetadata.Type'
+      additionalProperties: false
+      description: This is the is the container for the set of curriculum standards
+        metadata. Each member of the set contains the curriculum standards metadata
+        for a specific source of the GUIDs.
+    CurriculumStandardsMetadata.Type:
+      required:
+      - setOfGUIDs
+      type: object
+      properties:
+        providerId:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. This is used to
+            denote the originator of the GUID scheme.
+        setOfGUIDs:
+          minItems: 1
+          type: array
+          description: The set of curriculum standards GUIDs that apply to the learning
+            associated resource.
+          items:
+            $ref: '#/components/schemas/SetOfGUIDs.Type'
+      additionalProperties: false
+      description: This is the container for the special metadata for curriculum standards
+        for a particular domain of GUID provider.
+    LTILink.Type:
+      required:
+      - title
+      - vendor
+      type: object
+      properties:
+        title:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. The human readable
+            title/label for the activity being addressed by the content available
+            through the LTI link.
+        description:
+          type: string
+          description: Model Primitive Datatype = String. A human readable description
+            of the activity addressed by the content supplied via the LTI link.
+        custom:
+          $ref: '#/components/schemas/PropertySet.Type'
+        extensions:
+          $ref: '#/components/schemas/PlatformPropertySet.Type'
+        launch_url:
+          type: string
+          description: "Model Primitive Datatype = AnyURI. The URL for the LTI launch.\
+            \ One of either the launch_url or the secure_launch_url must be specified.\
+            \ It is acceptable to specify both and if both are specified, the Tool\
+            \ Consumer (TC) decides which to use. Typically, the TC will use a secure_launch_url\
+            \ when embedding the Tool in a secure page and the launch_url when embedding\
+            \ the tool in a non-secure page. So, it is important that the Tool Provider\
+            \ (TP) provides the same functionality whether the launch_url or secure_launch_url\
+            \ is used."
+          format: uri
+        secure_launch_url:
+          type: string
+          description: "Model Primitive Datatype = AnyURI. A secure URL for the LTI\
+            \ launch. One of either the launch_url or the secure_launch_url must be\
+            \ specified. It is acceptable to specify both and if both are specified,\
+            \ the Tool Consumer (TC) decides which to use. Typically, the TC will\
+            \ use a secure_launch_url when embedding the Tool in a secure page and\
+            \ the launch_url when embedding the tool in a non-secure page. So, it\
+            \ is important that the Tool Provider (TP) provides the same functionality\
+            \ whether the launch_url or secure_launch_url is used."
+          format: uri
+        icon:
+          type: string
+          description: Model Primitive Datatype = AnyURI. A URL to an icon for this
+            tool.
+          format: uri
+        secure_icon:
+          type: string
+          description: Model Primitive Datatype = AnyURI. A secure URL to an icon
+            for this tool.
+          format: uri
+        vendor:
+          $ref: '#/components/schemas/Vendor.Type'
+      additionalProperties: false
+      description: 'The container for all of the core information about an LTI Link. '
+    LTILinkResourceRef.Type:
+      required:
+      - name
+      - resourceUri
+      type: object
+      properties:
+        name:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. The name of the
+            type of content supplied by the link.
+        resourceUri:
+          type: string
+          description: Model Primitive Datatype = AnyURI. The URI for the link.
+          format: uri
+      additionalProperties: false
+      description: The container for the link information.
+    LabelledGUID.Type:
+      required:
+      - GUID
+      type: object
+      properties:
+        label:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. A human readable
+            string to provide a clue about the nature of the curriculum standard.
+        caseItemURI:
+          type: string
+          description: "Model Primitive Datatype = AnyURI. The corresponding Competency\
+            \ and Academic Standards (CASE) URI. This is the URI used for alignment\
+            \ with the IMS CASE Service 1.0 specification [CASE, 17]."
+          format: uri
+        GUID:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. The GUID itself.
+      additionalProperties: false
+      description: The labelled curriculum standard GUID.
+    LearningObjectives.Type:
+      required:
+      - alignmentType
+      type: object
+      properties:
+        alignmentType:
+          type: string
+          description: A category of alignment between the learning resource and the
+            framework node.
+          enum:
+          - assesses
+          - teaches
+          - requires
+          - textComplexity
+          - readingLevel
+          - educationalSubject
+          - educationLevel
+        educationalFramework:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. The framework
+            to which the resource being described is aligned.
+        targetDescription:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. The description
+            of a node in an established educational framework.
+        targetName:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. The name of a
+            node in an established educational framework.
+        targetURL:
+          type: string
+          description: Model Primitive Datatype = AnyURI. The URL of a node in an
+            established educational framework.
+          format: uri
+        caseItemUri:
+          type: string
+          description: "Model Primitive Datatype = AnyURI. Reference to a CASE CFItem\
+            \ for a standard or skill [CASE, 17]."
+          format: uri
+        caseItemGUID:
+          type: string
+          description: "Model Primitive Datatype = NormalizedString. Reference to\
+            \ CASE CFItem as a GUID [CASE, 17]."
+      additionalProperties: false
+      description: The container for the learning objectives which are addressed by
+        the resource.
+    Metadata.Type:
+      type: object
+      properties:
+        curriculumStandardsMetadataSet:
+          $ref: '#/components/schemas/CSMSet.Type'
+      additionalProperties: false
+      description: The container for all of the metadata associated with the LTI link.
+        Currently this metadata is restricted to the set of curriculum standards annotations.
+    PlatformPropertySet.Type:
+      required:
+      - platform
+      - properties
+      type: object
+      properties:
+        platform:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. The identifier
+            for the authoring environment.
+        properties:
+          minItems: 1
+          type: array
+          description: The set of extension properties for the identified platform.
+          items:
+            $ref: '#/components/schemas/Property.Type'
+      additionalProperties: false
+      description: The container for the collection of properties that are available
+        for a specific platform.
+    Property.Type:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        name:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. The name of the
+            key for the property.
+        value:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. The value for
+            the property.
+      additionalProperties: false
+      description: The container for the name/value pair for a specific property.
+    PropertySet.Type:
+      required:
+      - properties
+      type: object
+      properties:
+        properties:
+          minItems: 1
+          type: array
+          description: The set of properties for the identified platform or orginal
+            authoring platform.
+          items:
+            $ref: '#/components/schemas/Property.Type'
+      additionalProperties: false
+      description: The container for the collection of properties that have been specified.
+    Resource.Type:
+      required:
+      - learningResourceType
+      - name
+      - publisher
+      type: object
+      properties:
+        name:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. The name/title
+            of resource.
+        description:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. A human readable
+            description of the contents of the resource.
+        subject:
+          minItems: 0
+          type: array
+          description: Model Primitive Datatype = NormalizedString. The subject(s)
+            of the resource. May have multiple subjects tagged.
+          items:
+            type: string
+        url:
+          type: string
+          description: "Model Primitive Datatype = AnyURI. How to access resource\
+            \ over Internet e.g. HTTP, FTP, etc. A resource must have either a URL\
+            \ or or a LTI Link."
+          format: uri
+        ltiLink:
+          $ref: '#/components/schemas/CCLTILink.Type'
+        learningResourceType:
+          minItems: 1
+          type: array
+          description: The type of the resource. There may be multiple types.
+          items:
+            type: object
+        language:
+          minItems: 0
+          type: array
+          description: "Model Primitive Datatype = Language. The languages used in\
+            \ the resource. International two digit code for language e.g. 'en' for\
+            \ English. Use the [RFC 3066] annotation."
+          items:
+            type: string
+        thumbnailUrl:
+          type: string
+          description: Model Primitive Datatype = AnyURI. Link to a thumbnail representing
+            resource.
+          format: uri
+        typicalAgeRange:
+          type: string
+          description: "Model Primitive Datatype = NormalizedString. Age of the typical\
+            \ intended user. This is described as EITHER the minimum-maximum age range\
+            \ (the format is '11-12', '5-7', etc. with ONLY integers permitted) OR\
+            \ the age as a single integer e.g. '9'."
+        textComplexity:
+          minItems: 0
+          type: array
+          description: A number indicating text complexity based on number of established
+            measures.
+          items:
+            $ref: '#/components/schemas/TextComplexity.Type'
+        learningObjectives:
+          minItems: 0
+          type: array
+          description: The set of learning objectives addressed by the resource.
+          items:
+            $ref: '#/components/schemas/LearningObjectives.Type'
+        author:
+          minItems: 0
+          type: array
+          description: Model Primitive Datatype = NormalizedString. Author or creator
+            of the resource.
+          items:
+            type: string
+        publisher:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. Owner of the rights
+            to the resource or who made it available (company or person).
+        useRightsURL:
+          type: string
+          description: Model Primitive Datatype = AnyURI. URL describing how resource
+            can be licensed. Could be Creative Commons license link or link to other
+            specific open or proprietary license.
+          format: uri
+        timeRequired:
+          type: string
+          description: "Model Primitive Datatype = Duration. Time that the resource\
+            \ takes to consume. Use the [ISO 8601] format for a duration."
+        technicalFormat:
+          type: string
+          description: "Model Primitive Datatype = NormalizedString. A valid MIME\
+            \ type format for the resource e.g. text, HTML, PDF, MPEG, MP3, etc. See\
+            \ https://www.iana.org/assignments/media-types/media-types.xhtml."
+        educationalAudience:
+          minItems: 0
+          type: array
+          description: For whom the resource is intended.
+          items:
+            type: object
+        accessibilityAPI:
+          minItems: 0
+          type: array
+          description: Which (if any) accessibility API is supported by the resource.
+          items:
+            type: object
+        accessibilityInputMethods:
+          minItems: 0
+          type: array
+          description: "How the resource can be controlled by the user, which includes\
+            \ full keyboard controllability, mouse controllability, and voice controllability."
+          items:
+            type: object
+        accessibilityFeatures:
+          minItems: 0
+          type: array
+          description: "Model Primitive Datatype = NormalizedString. These include\
+            \ alternatives and listed enhancements for the resource. These can be\
+            \ transformation features, navigation features, control features or augmentation\
+            \ features."
+          items:
+            type: string
+        accessibilityHazards:
+          minItems: 0
+          type: array
+          description: The set of accessibility hazards which are encountered when
+            using this resource.
+          items:
+            type: object
+        accessMode:
+          minItems: 0
+          type: array
+          description: The human sensory perceptual system or cognitive faculty through
+            which a person may process or perceive information.
+          items:
+            type: object
+        publishDate:
+          type: string
+          description: "Model Primitive Datatype = Date. Date the resource was published\
+            \ by the publisher. The 'date' using the [ISO 8601] format."
+          format: date
+        rating:
+          type: string
+          description: A rating of the quality of the resource determined by the Search
+            Provider. Often derived from crowdsource ratings.
+          enum:
+          - "1"
+          - "2"
+          - "3"
+          - "4"
+          - "5"
+        relevance:
+          type: number
+          description: Model Primitive Datatype = Float. This is a floating point
+            value based on relevance to the specific search. Higher relevance has
+            a higher number.
+          format: float
+      additionalProperties: true
+      description: The container for the information about a resource that is supported
+        by a LOR.
+    ResourceSet.Type:
+      type: object
+      properties:
+        resources:
+          minItems: 0
+          type: array
+          description: The actual resources supplied by the service provider. The
+            order of resources is not significant.
+          items:
+            $ref: '#/components/schemas/Resource.Type'
+      additionalProperties: false
+      description: The container for the set of resources that have been supplied
+        by the service provider. This may be empty if none of the resources fulfill
+        the search criteria. The order of resources is not significant.
+    SetOfGUIDs.Type:
+      required:
+      - labelledGUID
+      type: object
+      properties:
+        region:
+          type: string
+          description: 'Model Primitive Datatype = NormalizedString. The region responsible
+            for the definition. '
+        version:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. This is used to
+            denote any relevant versioning information.
+        labelledGUID:
+          minItems: 1
+          type: array
+          description: The actual GUID plus the corresponding labelling information.
+          items:
+            $ref: '#/components/schemas/LabelledGUID.Type'
+      additionalProperties: false
+      description: The  container for the set of GUIDs that annotate a resource for
+        a particular geographical/socio-political/etc. region.
+    Subject.Type:
+      required:
+      - identifier
+      - name
+      - parent
+      type: object
+      properties:
+        identifier:
+          minimum: 1
+          type: integer
+          description: "Model Primitive Datatype = PositiveInteger. The unique identifier,\
+            \ an integer, of the subject node. For the root node the value will be\
+            \ 'null'. "
+          format: int32
+        name:
+          type: string
+          description: "Model Primitive Datatype = NormalizedString. The name of the\
+            \ subject node, which may have any character and need not be unique with\
+            \ the returned taxonomy. "
+        parent:
+          minimum: 1
+          type: integer
+          description: "Model Primitive Datatype = PositiveInteger. An integer (the\
+            \ identifier of that subject node) that references the single parent of\
+            \ this node. The returned data must be a true rooted tree, where each\
+            \ node returned has a single parent. "
+          format: int32
+      additionalProperties: false
+      description: This is the container for the details of a subject that is covered
+        by the content within a LOR.
+    SubjectSet.Type:
+      type: object
+      properties:
+        subjects:
+          minItems: 0
+          type: array
+          description: The actual list of subject supplied by the service provider.
+            The order of subjects is not significant.
+          items:
+            $ref: '#/components/schemas/Subject.Type'
+      additionalProperties: false
+      description: The container for the set of subjects that have been supplied by
+        the service provider. This may be empty if none of the subjects fulfill the
+        search criteria. The order of subjects is not significant.
+    TextComplexity.Type:
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the complexity measure. This is taken from an enumerated
+            vocabulary.
+          enum:
+          - Lexile
+          - Flesch-Kincaid
+          - Dale-Schall
+          - DRA
+          - Fountas-Pinnell
+        value:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. The text complexity
+            measure in terms of the named measuring scale.
+      additionalProperties: false
+      description: The name/pair value container for a text complexity annotation.
+    Vendor.Type:
+      required:
+      - code
+      - name
+      type: object
+      properties:
+        code:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. An identification
+            code for the vendor.
+        name:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. The name of the
+            vendor.
+        description:
+          type: string
+          description: Model Primitive Datatype = String. A human readable description
+            of the vendor.
+        url:
+          type: string
+          description: Model Primitive Datatype = AnyURI. A URL for the vendor.
+          format: uri
+        emailContact:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. Contact email
+            for the vendor.
+      additionalProperties: false
+      description: The container for the information about the vendor who created
+        the resource.
+    imsx_CodeMinor.Type:
+      required:
+      - imsx_codeMinorField
+      type: object
+      properties:
+        imsx_codeMinorField:
+          minItems: 1
+          type: array
+          description: Each reported code minor status code.
+          items:
+            $ref: '#/components/schemas/imsx_CodeMinorField.Type'
+      additionalProperties: false
+      description: This is the container for the set of code minor status codes reported
+        in the responses from the Service Provider.
+    imsx_CodeMinorField.Type:
+      required:
+      - imsx_codeMinorFieldName
+      - imsx_codeMinorFieldValue
+      type: object
+      properties:
+        imsx_codeMinorFieldName:
+          type: string
+          description: Model Primitive Datatype = NormalizedString. This should contain
+            the identity of the system that has produced the code minor status code
+            report.
+        imsx_codeMinorFieldValue:
+          type: string
+          description: The code minor status code (this is a value from the corresponding
+            enumerated vocabulary).
+          enum:
+          - fullsuccess
+          - forbidden
+          - invalid_query_parameter
+          - unauthorisedrequest
+          - internal_server_error
+          - server_busy
+          - invalid_data
+      additionalProperties: false
+      description: This is the container for a single code minor status code.
+    imsx_StatusInfo.Type:
+      required:
+      - imsx_codeMajor
+      - imsx_severity
+      type: object
+      properties:
+        imsx_codeMajor:
+          type: string
+          description: The code major value (from the corresponding enumerated vocabulary).
+          enum:
+          - success
+          - processing
+          - failure
+          - unsupported
+        imsx_severity:
+          type: string
+          description: The severity value (from the corresponding enumerated vocabulary).
+          enum:
+          - status
+          - warning
+          - error
+        imsx_description:
+          type: string
+          description: Model Primitive Datatype = String. A human readable description
+            supplied by the entity creating the status code information.
+        imsx_codeMinor:
+          $ref: '#/components/schemas/imsx_CodeMinor.Type'
+      additionalProperties: false
+      description: This is the container for the status code and associated information
+        returned within the HTTP messages received from the Service Provider.
+x-original-swagger-version: "2.0"
